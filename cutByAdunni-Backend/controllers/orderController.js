@@ -3,13 +3,15 @@ const Order = require("../models/Order");
 // Create a new order
 exports.createOrder = async (req, res) => {
   try {
-    const { fabricDetails, measurements, additionalNotes } = req.body;
+    const { fabricDetails, measurements, additionalNotes, customerName, email } = req.body;
 
     const newOrder = await Order.create({
       user: req.userId, // User ID from auth middleware
       fabricDetails,
       measurements,
       additionalNotes,
+      customerName,
+      email,
       status: "pending", // Default status
     });
 

@@ -1,0 +1,25 @@
+/* Splash Container */
+.splash-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #F5C518;
+  /* background-color: #F7F7F7; */
+  /* background: linear-gradient(90deg, black, gray); */
+  color: #fff;
+  text-align: center;
+}
+
+/* Logo */
+.splash-logo {
+  width: 80%; /* Default for smaller screens */
+  max-width: 500px; /* Upper limit for larger screens */
+  height: auto;
+  margin-bottom: 20px;
+}
+
+
+
+

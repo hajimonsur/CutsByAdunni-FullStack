@@ -18,7 +18,7 @@ const PortfolioSchema = new mongoose.Schema({
     category: {
         type: String,
         required: true,
-        enum: ["casual", "formal", "bridal", "traditional", "other"], // Define categories for easy filtering
+        enum: ["casual", "formal", "bridal", "traditional", "others"], // Define categories for easy filtering
       },
 });
 

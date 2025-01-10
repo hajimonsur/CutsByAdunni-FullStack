@@ -1,45 +1,49 @@
 const mongoose = require("mongoose");
 
 const OrderSchema = new mongoose.Schema({
-  customerName: { 
+  customerName: {
     type: String,
-     required: true
-     },
+    required: true,
+  },
 
-  email: { 
+  email: {
     type: String,
-     required: true
-     },
+    required: true,
+  },
 
   fabricDetails: {
-     type: String,
-      required: true
-     },
+    type: String,
+    required: true,
+  },
 
-  measurements: { 
+  measurements: {
     type: Object,
-     required: true
-     }, // Example: { chest: 40, waist: 30 }
+    required: true,
+  }, // Example: { chest: 40, waist: 30 }
 
-  date: { 
+  date: {
     type: Date,
-     required: true
-     },
+    //  required: true
+  },
 
-  time: { 
+  time: {
     type: String,
-     required: true
-     },
+  },
 
-     additionalNotes: {
-      type: String,
-     },
-
-  status: { 
+  additionalNotes: {
     type: String,
-     enum: ["pending", "in progress", "completed"],
-      default: "pending" },
+  },
 
+  status: {
+    type: String,
+    enum: ["pending", "in progress", "completed"],
+    default: "pending",
+  },
+
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User", // Ensure 'User' is the correct model name
+  },
 });
 
 module.exports = mongoose.model("Order", OrderSchema);
