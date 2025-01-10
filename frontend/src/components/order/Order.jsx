@@ -1,7 +1,7 @@
-import React from "react";
-import { Form, Button, Image, Card } from "react-bootstrap";
+import React, { useState } from "react";
+import { Form, Button, Card } from "react-bootstrap";
+import { FaRuler, FaPalette, FaTruck } from "react-icons/fa";
 import Accordion from "react-bootstrap/Accordion";
-import { useState } from "react";
 
 const OrderPage = () => {
   const styles = {
@@ -11,10 +11,41 @@ const OrderPage = () => {
     },
     section: {
       padding: "40px 20px",
+      // backgroundColor: "#fff8e1", // Soft background color for a warm, inviting feel
+      borderRadius: "10px",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+      margin: "2rem auto",
+      maxWidth: "1200px",
     },
     formContainer: {
       maxWidth: "600px",
       margin: "0 auto",
+    },
+    icon: {
+      fontSize: "60px", // Increase icon size
+      color: "#FFC107", // Highlight icon color
+    },
+    stepContainer: {
+      display: "flex",
+      justifyContent: "center",
+      flexWrap: "wrap",
+      marginTop: "30px",
+      gap: "2rem", // Added gap for better spacing
+    },
+    step: {
+      textAlign: "center",
+      margin: "20px",
+      maxWidth: "300px",
+      padding: "20px",
+      borderRadius: "10px",
+      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+      backgroundColor: "#f8f9fa",
+      transition: "transform 0.3s ease, box-shadow 0.3s ease",
+      cursor: "pointer",
+      "&:hover": {
+        transform: "scale(1.05)",
+        boxShadow: "0 8px 12px rgba(0, 0, 0, 0.2)",
+      },
     },
     galleryImage: {
       width: "30%",
@@ -31,14 +62,6 @@ const OrderPage = () => {
     },
   };
 
-  const scrollToCustomizeOrder = () => {
-    const element = document.getElementById("customize-order-section");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
-  const apiUrl = import.meta.env.VITE_API_URL;
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [fabricDetails, setFabricDetails] = useState("");
@@ -56,20 +79,23 @@ const OrderPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${apiUrl}/api/orders`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-        body: JSON.stringify({
-          customerName: name,
-          email,
-          fabricDetails,
-          measurements,
-          additionalNotes,
-        }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/orders`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+          body: JSON.stringify({
+            customerName: name,
+            email,
+            fabricDetails,
+            measurements,
+            additionalNotes,
+          }),
+        }
+      );
 
       if (response.ok) {
         alert("Order submitted successfully!");
@@ -93,44 +119,27 @@ const OrderPage = () => {
           Experience the finest tailoring with CutByAdunni. Your perfect fit,
           designed just for you.
         </p>
-        <Button variant="warning" size="lg" onClick={scrollToCustomizeOrder}>
+        <Button variant="warning" size="lg" href="#customize-order-section">
           Start Your Order
         </Button>
       </section>
 
       {/* Order Steps */}
       <section style={styles.section}>
-        <h2 className="text-center">How It Works</h2>
-        <div className="d-flex justify-content-around flex-wrap mt-4">
-          <div className="text-center">
-            <Image
-              src="./images/measurements.png"
-              alt="Measurements"
-              width={100}
-              height={100}
-            />
+        <h2 className="text-center mb-5">How It Works</h2>
+        <div style={styles.stepContainer}>
+          <div className={styles.step}>
+            <FaRuler style={styles.icon} />
             <h4>Step 1: Provide Measurements</h4>
             <p>Share your exact body measurements for a perfect fit.</p>
           </div>
-          <div className="text-center">
-            <Image
-              src="./images/style.png"
-              alt="Choose Style"
-              width={100}
-              height={100}
-            />
+          <div className={styles.step}>
+            <FaPalette style={styles.icon} />
             <h4>Step 2: Choose Your Style</h4>
-            <p>
-              Select your preferred design from our catalog or share your own.
-            </p>
+            <p>Select your preferred design from our catalog or share your own.</p>
           </div>
-          <div className="text-center">
-            <Image
-              src="./images/delivery.png"
-              alt="Delivery"
-              width={100}
-              height={100}
-            />
+          <div className={styles.step}>
+            <FaTruck style={styles.icon} />
             <h4>Step 3: Receive Your Outfit</h4>
             <p>We’ll deliver your custom-made outfit to your doorstep.</p>
           </div>
@@ -193,7 +202,7 @@ const OrderPage = () => {
               />
             </Form.Group>
 
-            <Button variant="warning" type="submit" className="mt-3 ">
+            <Button variant="warning" type="submit" className="mt-3">
               Submit Order
             </Button>
           </Form>
@@ -204,17 +213,17 @@ const OrderPage = () => {
       <section style={styles.section}>
         <h2 className="text-center">Get Inspired</h2>
         <div className="d-flex justify-content-center flex-wrap">
-          <Image
+          <img
             src="./images/gallery1.jpg"
             alt="Gallery 1"
             style={styles.galleryImage}
           />
-          <Image
+          <img
             src="./images/gallery2.jpg"
             alt="Gallery 2"
             style={styles.galleryImage}
           />
-          <Image
+          <img
             src="./images/gallery3.jpg"
             alt="Gallery 3"
             style={styles.galleryImage}
@@ -223,33 +232,34 @@ const OrderPage = () => {
       </section>
 
       {/* FAQ Section */}
-
-      <Accordion className="mt-4 container mx-auto">
+      <section style={styles.section}>
         <h2 className="text-center">Frequently Asked Questions</h2>
-        <Accordion.Item eventKey="0">
-          <Accordion.Header>
-            How long does it take to receive my order?
-          </Accordion.Header>
-          <Accordion.Body>
-            Our typical turnaround time is 7-14 business days.
-          </Accordion.Body>
-        </Accordion.Item>
-        <Accordion.Item eventKey="1">
-          <Accordion.Header>Can I provide my own design?</Accordion.Header>
-          <Accordion.Body>
-            Yes, absolutely! You can upload your design during the order
-            process.
-          </Accordion.Body>
-        </Accordion.Item>
-        <Accordion.Item eventKey="2">
-          <Accordion.Header>
-            What if the outfit doesn’t fit perfectly?
-          </Accordion.Header>
-          <Accordion.Body>
-            We offer free alterations to ensure your complete satisfaction.
-          </Accordion.Body>
-        </Accordion.Item>
-      </Accordion>
+        <Accordion className="container mx-auto">
+          <Accordion.Item eventKey="0">
+            <Accordion.Header>
+              How long does it take to receive my order?
+            </Accordion.Header>
+            <Accordion.Body>
+              Our typical turnaround time is 7-14 business days.
+            </Accordion.Body>
+          </Accordion.Item>
+          <Accordion.Item eventKey="1">
+            <Accordion.Header>Can I provide my own design?</Accordion.Header>
+            <Accordion.Body>
+              Yes, absolutely! You can upload your design during the order
+              process.
+            </Accordion.Body>
+          </Accordion.Item>
+          <Accordion.Item eventKey="2">
+            <Accordion.Header>
+              What if the outfit doesn’t fit perfectly?
+            </Accordion.Header>
+            <Accordion.Body>
+              We offer free alterations to ensure your complete satisfaction.
+            </Accordion.Body>
+          </Accordion.Item>
+        </Accordion>
+      </section>
     </div>
   );
 };
