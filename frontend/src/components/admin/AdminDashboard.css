@@ -1,0 +1,52 @@
+/* Add custom styles to enhance the layout */
+.sidebar-col {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-right: 1px solid #ddd;
+  }
+  
+  .dashboard-col {
+    padding: 20px;
+  }
+  
+  .welcome-card {
+    background-color: #f7f7f7;
+    border-radius: 8px;
+  }
+  
+  .order-card {
+    border-radius: 8px;
+  }
+  
+  .order-col {
+    padding: 0 10px;
+  }
+  
+  .card-header {
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+  
+  .card-body {
+    background-color: #fff;
+  }
+  
+  .order-card .btn {
+    width: 100%;
+  }
+  
+  /* Enhance the button with hover effects */
+  .order-card .btn:hover {
+    background-color: #e6a600;
+  }
+  
+  @media (max-width: 768px) {
+    .sidebar-col {
+      width: 100%;
+    }
+  
+    .dashboard-col {
+      width: 100%;
+    }
+  }
+  

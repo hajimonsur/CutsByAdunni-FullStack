@@ -1,0 +1,20 @@
+/* In your CSS file */
+@media (max-width: 768px) {
+    .admin-sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 60px; /* Collapsed width */
+      height: 100%;
+      overflow-y: auto;
+    }
+  
+    .admin-sidebar .sidebar-item {
+      display: none; /* Hide sidebar items when collapsed */
+    }
+  
+    .admin-sidebar .collapsed {
+      display: block; /* Show icon or button for opening sidebar */
+    }
+  }
+  

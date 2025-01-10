@@ -1,13 +1,13 @@
 import React from "react";
 import { Form, Button, Image, Card } from "react-bootstrap";
 import Accordion from "react-bootstrap/Accordion";
+import { useState } from "react";
 
 const OrderPage = () => {
   const styles = {
     hero: {
       padding: "50px 20px",
       textAlign: "center",
-      // backgroundColor: "#f8f9fa",
     },
     section: {
       padding: "40px 20px",
@@ -35,6 +35,52 @@ const OrderPage = () => {
     const element = document.getElementById("customize-order-section");
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [fabricDetails, setFabricDetails] = useState("");
+  const [measurements, setMeasurements] = useState("");
+  const [additionalNotes, setAdditionalNotes] = useState("");
+
+  const handleClear = () => {
+    setName("");
+    setEmail("");
+    setFabricDetails("");
+    setMeasurements("");
+    setAdditionalNotes("");
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`${apiUrl}/api/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+        body: JSON.stringify({
+          customerName: name,
+          email,
+          fabricDetails,
+          measurements,
+          additionalNotes,
+        }),
+      });
+
+      if (response.ok) {
+        alert("Order submitted successfully!");
+        handleClear();
+        window.location.reload();
+      } else {
+        alert("Failed to submit order. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error submitting order:", error);
+      alert("Failed to submit order. Please try again.");
     }
   };
 
@@ -95,15 +141,25 @@ const OrderPage = () => {
       <section id="customize-order-section" style={styles.section}>
         <h2 className="text-center">Customize Your Order</h2>
         <div style={styles.formContainer}>
-          <Form>
+          <Form onSubmit={handleSubmit}>
             <Form.Group controlId="name">
               <Form.Label>Name</Form.Label>
-              <Form.Control type="text" placeholder="Enter your name" />
+              <Form.Control
+                type="text"
+                placeholder="Enter your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
             </Form.Group>
 
             <Form.Group controlId="email">
               <Form.Label>Email Address</Form.Label>
-              <Form.Control type="email" placeholder="Enter your email" />
+              <Form.Control
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </Form.Group>
 
             <Form.Group controlId="fabricDetail">
@@ -111,12 +167,19 @@ const OrderPage = () => {
               <Form.Control
                 type="text"
                 placeholder="Describe your preferred fabric"
+                value={fabricDetails}
+                onChange={(e) => setFabricDetails(e.target.value)}
               />
             </Form.Group>
 
             <Form.Group controlId="measurements">
               <Form.Label>Measurements</Form.Label>
-              <Form.Control type="text" placeholder="Input your measurements" />
+              <Form.Control
+                type="text"
+                placeholder="Input your measurements"
+                value={measurements}
+                onChange={(e) => setMeasurements(e.target.value)}
+              />
             </Form.Group>
 
             <Form.Group controlId="notes">
@@ -125,6 +188,8 @@ const OrderPage = () => {
                 as="textarea"
                 rows={3}
                 placeholder="Add any specific requests or details"
+                value={additionalNotes}
+                onChange={(e) => setAdditionalNotes(e.target.value)}
               />
             </Form.Group>
 
