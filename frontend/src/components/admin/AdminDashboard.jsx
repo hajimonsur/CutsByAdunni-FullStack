@@ -11,7 +11,8 @@ import {
 } from "reactstrap";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import AdminSidebar from "./AdminSidebar";
-import "./AdminDashboard.css"; // Add custom CSS for additional styling
+import "./AdminDashboard.css";
+import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
   const [admin, setAdmin] = useState(null);
@@ -20,6 +21,12 @@ const AdminDashboard = () => {
   const [error, setError] = useState(null);
 
   const apiUrl = import.meta.env.VITE_API_URL;
+
+  const navigate = useNavigate();
+
+  const handleViewOrderDetails = (orderId) => {
+    navigate(`/order/${orderId}`); // Redirect to order details page
+  };
 
   useEffect(() => {
     const adminDetails = JSON.parse(localStorage.getItem("user"));
@@ -53,7 +60,6 @@ const AdminDashboard = () => {
     }
   };
 
-
   if (loading) {
     return <h3>Loading...</h3>;
   }
@@ -65,7 +71,6 @@ const AdminDashboard = () => {
   if (!admin) {
     return <h3>Admin not found. Please log in.</h3>;
   }
-
 
   return (
     <Container fluid>
@@ -91,6 +96,10 @@ const AdminDashboard = () => {
                   <Row>
                     {orders.length > 0 ? (
                       orders
+                        .sort(
+                          (a, b) =>
+                            new Date(b.createdAt) - new Date(a.createdAt)
+                        ) // Sort orders by createdAt in descending order
                         .slice(0, 5) // Display only the first 5 orders (most recent)
                         .map((order, index) => (
                           <Col
@@ -127,7 +136,13 @@ const AdminDashboard = () => {
                                     )}
                                   </Badge>
                                 </p>
-                                <Button color="warning" size="sm">
+                                <Button
+                                  color="warning"
+                                  size="sm"
+                                  onClick={() =>
+                                    handleViewOrderDetails(order._id)
+                                  }
+                                >
                                   View Order Details
                                 </Button>
                               </CardBody>

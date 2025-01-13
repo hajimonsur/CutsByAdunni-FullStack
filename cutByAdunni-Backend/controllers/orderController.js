@@ -3,7 +3,16 @@ const Order = require("../models/Order");
 // Create a new order
 exports.createOrder = async (req, res) => {
   try {
-    const { fabricDetails, measurements, additionalNotes, customerName, email } = req.body;
+    const {
+      fabricDetails,
+      measurements,
+      additionalNotes,
+      customerName,
+      email,
+      styleInspo,
+      date,
+      time,
+    } = req.body;
 
     const newOrder = await Order.create({
       user: req.userId, // User ID from auth middleware
@@ -12,10 +21,15 @@ exports.createOrder = async (req, res) => {
       additionalNotes,
       customerName,
       email,
+      styleInspo,
+      date,
+      time,
       status: "pending", // Default status
     });
 
-    res.status(201).json({ message: "Order created successfully", data: newOrder });
+    res
+      .status(201)
+      .json({ message: "Order created successfully", data: newOrder });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -42,6 +56,31 @@ exports.getUserOrders = async (req, res) => {
     res.status(200).json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+// view single order (admin)
+exports.viewSingleOrder = async (req, res) => {
+  try {
+
+    if (req.userRole !== "admin") {
+      return res.status(403).json({ message: "Access denied. Admins only." });
+    }
+
+    const { id } = req.params; // Assuming orderId is passed as a URL parameter
+
+    // Find the order by its ID in the database
+    const order = await Order.findById(id);
+
+    // Check if the order exists
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Return the order data as a response
+    res.status(200).json(order);
+  } catch (error) {
+    console.error("Error fetching order:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 

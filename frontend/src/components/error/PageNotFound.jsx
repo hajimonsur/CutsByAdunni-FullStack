@@ -30,7 +30,7 @@ const PageNotFound = () => {
   return (
     <div className='container mt-5' style={styles.container}>
         <h1 className="text-danger text-center">Page Not Found</h1>
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRyl3KOobxh1qt0aLElLE6SnF1cFGZ8yo37w&s" alt="404 Page Not Found " style={styles.img} />
+        <img src="https://cdn-icons-png.flaticon.com/512/755/755014.png" alt="404 Page Not Found " style={styles.img} />
         <Link to="/" style={styles.btn}>Go Home</Link>
     </div>
   )

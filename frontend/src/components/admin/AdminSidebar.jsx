@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button, Card, Nav, NavItem, NavLink } from "reactstrap";
-import { FaUser, FaCogs, FaClipboardList } from "react-icons/fa"; // Optional: use icons for a better UI
+import { FaUser, FaCogs, FaClipboardList,  FaTasks } from "react-icons/fa"; // Optional: use icons for a better UI
 import "./AdminSidebar.css";
 const AdminSidebar = () => {
   return (
@@ -23,6 +23,14 @@ const AdminSidebar = () => {
             <Button color="warning" block>
               <FaClipboardList className="mr-2" />
               Update Portfolio
+            </Button>
+          </NavLink>
+        </NavItem>
+        <NavItem>
+          <NavLink tag={Link} to="/adminOrder">
+            <Button color="warning" block>
+            <FaTasks className="mr-2" />
+              Orders
             </Button>
           </NavLink>
         </NavItem>

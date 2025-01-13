@@ -122,7 +122,7 @@ const PortfolioPage = () => {
       <section style={styles.section}>
         <h2 className="text-center">Our Achievements</h2>
         <ul style={{ maxWidth: '600px', margin: '20px auto', listStyle: 'none' }}>
-          <li style={{ marginBottom: '10px' }}>🎉 Over 500 satisfied clients.</li>
+          <li style={{ marginBottom: '10px' }}>🎉 Over 500 satisfied returning clients.</li>
           <li style={{ marginBottom: '10px' }}>🌍 Featured in "Top Tailors in Lagos."</li>
           <li style={{ marginBottom: '10px' }}>🏆 Awarded "Best Tailor of the Year 2024."</li>
         </ul>

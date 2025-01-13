@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Form, Button, Card } from "react-bootstrap";
 import { FaRuler, FaPalette, FaTruck } from "react-icons/fa";
 import Accordion from "react-bootstrap/Accordion";
+import { Widget } from "@uploadcare/react-widget";
+
 
 const OrderPage = () => {
   const styles = {
@@ -67,6 +69,10 @@ const OrderPage = () => {
   const [fabricDetails, setFabricDetails] = useState("");
   const [measurements, setMeasurements] = useState("");
   const [additionalNotes, setAdditionalNotes] = useState("");
+  const [styleInspo, setStyleInspo] = useState([]);
+
+  const pubKey = import.meta.env.VITE_REACT_APP_UPLOADCARE_PUBLIC_KEY;
+
 
   const handleClear = () => {
     setName("");
@@ -74,6 +80,8 @@ const OrderPage = () => {
     setFabricDetails("");
     setMeasurements("");
     setAdditionalNotes("");
+    setStyleInspo([]);
+    
   };
 
   const handleSubmit = async (e) => {
@@ -93,6 +101,7 @@ const OrderPage = () => {
             fabricDetails,
             measurements,
             additionalNotes,
+            styleInspo: styleInspo,
           }),
         }
       );
@@ -120,7 +129,7 @@ const OrderPage = () => {
           designed just for you.
         </p>
         <Button variant="warning" size="lg" href="#customize-order-section">
-          Start Your Order
+          Place Your Order
         </Button>
       </section>
 
@@ -190,6 +199,26 @@ const OrderPage = () => {
                 onChange={(e) => setMeasurements(e.target.value)}
               />
             </Form.Group>
+            <div className="mb-3">
+              <label
+                htmlFor="uploadcareUploader"
+                className="form-label d-block mb-2"
+              >
+                <b>Upload Style Inspo</b>
+              </label>
+              <Widget
+                publicKey={pubKey}
+                multiple={false} // Disable multiple file selection
+                onChange={(fileInfo) => {
+                  // Extract the URL for the single uploaded file
+                  const url = fileInfo.cdnUrl;
+
+                  // Update state with the single image URL
+                  setStyleInspo([url]); // Use an array to stay consistent if your state expects multiple images
+                  {console.log(url)}
+                }}
+              />
+            </div>
 
             <Form.Group controlId="notes">
               <Form.Label>Additional Notes</Form.Label>

@@ -13,6 +13,9 @@ import Signup from "./components/authentication/Signup";
 import UpdatePortfolio from "./components/portfolio/UpdatePortfolio";
 import ProtectedRoute from "./components/ProtectedRoute"; // Import ProtectedRoute component
 import PageNotFound from "./components/error/PageNotFound";
+import SingleOrder from "./components/order/SingleOrder";
+import AdminOrder from "./components/order/AdminOrder";
+import Profile from "./components/profile/Profile";
 
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
@@ -26,7 +29,8 @@ const App = () => {
 
   return (
     <div>
-      {showSplash ? <Splash /> : <NavComp />}
+      {showSplash ? <Splash /> :   <div>
+      <NavComp />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/order" element={<OrderPage />} />
@@ -36,8 +40,11 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/update" element={<UpdatePortfolio />} />
         <Route path="*" element={<PageNotFound />} />
+        <Route path="/order/:id" element={<SingleOrder />} />
+        <Route path="/adminOrder" element={<AdminOrder/>}/>
+        <Route path="/profile" element={<Profile/>}/>
         
-        {/* Use ProtectedRoute for the /admin path */}
+        {/* ProtectedRoute for the /admin path */}
         <Route
           path="/admin"
           element={
@@ -48,6 +55,9 @@ const App = () => {
         />
       </Routes>
       <Footer />
+      </div>}
+    
+    
     </div>
   );
 };
