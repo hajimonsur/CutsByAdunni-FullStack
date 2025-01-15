@@ -3,10 +3,12 @@ const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const cors = require("cors");
 
+
 dotenv.config();
 connectDB();
 
 const app = express();
+
 
 app.use(cors());
 
@@ -18,6 +20,9 @@ app.use("/api/bookings", require("./routes/bookings"));
 app.use("/api/orders", require("./routes/orders"));
 app.use("/api/portfolio", require("./routes/portfolio"));
 app.use("/api/users", require("./routes/users"));
+app.use("/api/testimony", require("./routes/testimony"));
+
+
 
 
 

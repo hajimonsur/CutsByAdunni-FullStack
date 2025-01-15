@@ -3,13 +3,19 @@ import HeroSection from "../hero/Hero";
 import { Image, Carousel, Button, Form, Alert } from "react-bootstrap";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faScissors, faDollarSign, faClock } from "@fortawesome/free-solid-svg-icons";
+import {
+  faScissors,
+  faDollarSign,
+  faClock,
+} from "@fortawesome/free-solid-svg-icons";
 import "./home.css";
+import UploadTestimony from "../testimony/UploadTestimony";
 
 const HomePage = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
 
   const [portfolioItems, setPortfolioItems] = useState([]);
+  const [testimony, setTestimony] = useState([]);
   const [contactDetails, setContactDetails] = useState({
     name: "",
     email: "",
@@ -31,6 +37,26 @@ const HomePage = () => {
     fetchPortfolio();
   }, []);
 
+  useEffect(() => {
+    const fetchTestimony = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/api/testimony`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
+        const data = await response.json();
+        setTestimony(data);
+      } catch (error) {
+        console.error("Error fetching testimony:", error);
+      }
+    };
+
+    fetchTestimony();
+  }, []);
+
   const handleContactSubmit = (e) => {
     e.preventDefault();
     setShowAlert(true);
@@ -49,17 +75,29 @@ const HomePage = () => {
         <div className="container">
           <div className="row justify-content-center mt-4">
             <div className="col-md-4 text-center mb-4">
-              <FontAwesomeIcon icon={faScissors} size="3x" className="text-warning" />
+              <FontAwesomeIcon
+                icon={faScissors}
+                size="3x"
+                className="text-warning"
+              />
               <h4 className="mt-3">Custom Tailoring</h4>
               <p>Made-to-measure outfits for every occasion.</p>
             </div>
             <div className="col-md-4 text-center mb-4">
-              <FontAwesomeIcon icon={faDollarSign} size="3x" className="text-success" />
+              <FontAwesomeIcon
+                icon={faDollarSign}
+                size="3x"
+                className="text-success"
+              />
               <h4 className="mt-3">Affordable Pricing</h4>
               <p>Style that fits your budget.</p>
             </div>
             <div className="col-md-4 text-center mb-4">
-              <FontAwesomeIcon icon={faClock} size="3x" className="text-primary" />
+              <FontAwesomeIcon
+                icon={faClock}
+                size="3x"
+                className="text-primary"
+              />
               <h4 className="mt-3">Quick Turnaround</h4>
               <p>Get your outfits when you need them.</p>
             </div>
@@ -99,45 +137,34 @@ const HomePage = () => {
 
       {/* Testimonials Section */}
       <section className="py-5 bg-light text-dark">
-        <h2 className="text-center mb-4">What Our Clients Say</h2>
-        <Carousel className="testimonial-carousel">
-          <Carousel.Item>
-            <div className="testimonial-item text-center">
-              <Image
-                src="./images/client1.jpg"
-                roundedCircle
-                className="testimonial-avatar"
-              />
-              <p className="quote">
-                "Cuts By Adunni brought my dream outfit to life. I felt so
-                confident and beautiful!"
-              </p>
-              <h5 className="client-name mt-3">Ikobayo Tawakalitu</h5>
+  <h2 className="text-center mb-4">What Our Clients Say</h2>
+  <div className="container">
+    <div className="row justify-content-center">
+      {testimony.map((item) => (
+        <div key={item.id} className="col-12 col-md-6 col-lg-4 mb-4">
+          <div className="card shadow-sm border-0 rounded">
+            <div className="card-body">
+              <p className="card-text mb-4 text-muted">{item.testimony}</p>
+              <h5 className="card-title text-dark font-weight-bold">{item.name}</h5>
             </div>
-          </Carousel.Item>
-          <Carousel.Item>
-            <div className="testimonial-item text-center">
-              <Image
-                src="./images/client2.jpg"
-                roundedCircle
-                className="testimonial-avatar"
-              />
-              <p className="quote">
-                "The damask dress I ordered was stunning and made me stand out
-                at the event!"
-              </p>
-              <h5 className="client-name mt-3">Amode Masida</h5>
-            </div>
-          </Carousel.Item>
-        </Carousel>
-      </section>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
 
       {/* Contact Section */}
-      <section className="py-5 text-dark">
+      {/* <section className="py-5 text-dark">
         <h2 className="text-center mb-4">Get in Touch</h2>
         <div className="container">
           {showAlert && (
-            <Alert variant="success" onClose={() => setShowAlert(false)} dismissible>
+            <Alert
+              variant="success"
+              onClose={() => setShowAlert(false)}
+              dismissible
+            >
               Thank you for reaching out! We'll get back to you soon.
             </Alert>
           )}
@@ -151,7 +178,10 @@ const HomePage = () => {
                     placeholder="Enter your name"
                     value={contactDetails.name}
                     onChange={(e) =>
-                      setContactDetails({ ...contactDetails, name: e.target.value })
+                      setContactDetails({
+                        ...contactDetails,
+                        name: e.target.value,
+                      })
                     }
                   />
                 </Form.Group>
@@ -162,7 +192,10 @@ const HomePage = () => {
                     placeholder="Enter your email"
                     value={contactDetails.email}
                     onChange={(e) =>
-                      setContactDetails({ ...contactDetails, email: e.target.value })
+                      setContactDetails({
+                        ...contactDetails,
+                        email: e.target.value,
+                      })
                     }
                   />
                 </Form.Group>
@@ -174,7 +207,10 @@ const HomePage = () => {
                     placeholder="Your message"
                     value={contactDetails.message}
                     onChange={(e) =>
-                      setContactDetails({ ...contactDetails, message: e.target.value })
+                      setContactDetails({
+                        ...contactDetails,
+                        message: e.target.value,
+                      })
                     }
                   />
                 </Form.Group>
@@ -185,7 +221,8 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
+      <UploadTestimony/>
     </div>
   );
 };

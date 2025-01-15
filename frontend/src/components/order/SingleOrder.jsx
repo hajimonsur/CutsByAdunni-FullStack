@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Container,
   Card,
@@ -12,20 +12,21 @@ import {
   ModalBody,
   ModalFooter,
 } from "reactstrap";
-import { useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 
 const SingleOrder = () => {
   const { id } = useParams(); // Extract the order ID from the URL
   const navigate = useNavigate();
+
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false); // Modal state for full-screen image
+  const [modalOpen, setModalOpen] = useState(false); // Modal state for image
   const [imageUrl, setImageUrl] = useState("");
-  const [confirmDeleteModal, setConfirmDeleteModal] = useState(false); // State for delete confirmation modal
-  const apiUrl = import.meta.env.VITE_API_URL;
+  const [confirmDeleteModal, setConfirmDeleteModal] = useState(false); // Delete confirmation modal state
+  const apiUrl = import.meta.env.VITE_API_URL; // Environment variable for API base URL
 
+  // Fetch order details
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
@@ -36,12 +37,9 @@ const SingleOrder = () => {
           },
         });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch order details");
-        }
+        if (!response.ok) throw new Error("Failed to fetch order details");
 
         const data = await response.json();
-
         setOrder(data);
         setLoading(false);
       } catch (err) {
@@ -53,18 +51,18 @@ const SingleOrder = () => {
     fetchOrderDetails();
   }, [id, apiUrl]);
 
-  // Open the full-screen modal
-  const openModal = () => {
-    setImageUrl(order.styleInspo);
+  // Open the full-screen modal for the image
+  const openModal = (image) => {
+    setImageUrl(image);
     setModalOpen(true);
   };
 
-  // Close the full-screen modal
+  // Close the image modal
   const closeModal = () => {
     setModalOpen(false);
   };
 
-  // Handle Delete Order
+  // Delete the order
   const handleDeleteOrder = async () => {
     try {
       const response = await fetch(`${apiUrl}/api/orders/${id}`, {
@@ -74,18 +72,15 @@ const SingleOrder = () => {
         },
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to delete order");
-      }
+      if (!response.ok) throw new Error("Failed to delete order");
 
-      // Redirect to the dashboard after successful deletion
-      navigate("/admin");
+      navigate("/admin"); // Redirect to dashboard on success
     } catch (err) {
       setError(err.message);
     }
   };
 
-  // Toggle the Order Status between "Completed" and other statuses
+  // Toggle order status
   const toggleOrderStatus = async () => {
     const newStatus =
       order.status === "Completed" ? "In Progress" : "Completed";
@@ -100,28 +95,28 @@ const SingleOrder = () => {
         body: JSON.stringify({ status: newStatus }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to update order status");
-      }
+      if (!response.ok) throw new Error("Failed to update order status");
+      window.location.reload();
 
       const updatedOrder = await response.json();
-      setOrder(updatedOrder); // Update the order state with the new status
+      setOrder(updatedOrder);
     } catch (err) {
       setError(err.message);
     }
   };
 
-  // Toggle Delete Confirmation Modal
+  // Toggle delete confirmation modal
   const toggleConfirmDeleteModal = () => {
     setConfirmDeleteModal(!confirmDeleteModal);
   };
 
+  // Render loading or error state
   if (loading) return <h3 className="text-center">Loading order details...</h3>;
   if (error) return <h3 className="text-center text-danger">{error}</h3>;
 
   return (
     <Container className="mt-5">
-      <Row className="mb-4">
+      {/* <Row className="mb-4">
         <Col>
           <Button
             variant="warning"
@@ -131,7 +126,7 @@ const SingleOrder = () => {
             Back to Dashboard
           </Button>
         </Col>
-      </Row>
+      </Row> */}
 
       <Row>
         <Col md="8" className="mx-auto">
@@ -139,30 +134,25 @@ const SingleOrder = () => {
             <CardBody>
               <h3 className="text-center mb-4">Order Details</h3>
 
-              {/* Order ID */}
+              {/* Order Information */}
               <Row className="mb-3">
                 <Col sm="4" className="fw-bold text-dark">
                   Order ID:
                 </Col>
                 <Col>{order._id}</Col>
               </Row>
-
-              {/* Customer Info */}
               <Row className="mb-3">
                 <Col sm="4" className="fw-bold text-dark">
                   Customer:
                 </Col>
                 <Col>{order.customerName}</Col>
               </Row>
-
               <Row className="mb-3">
                 <Col sm="4" className="fw-bold text-dark">
                   Email:
                 </Col>
                 <Col>{order.email}</Col>
               </Row>
-
-              {/* Order Status */}
               <Row className="mb-3">
                 <Col sm="4" className="fw-bold text-dark">
                   Status:
@@ -177,7 +167,7 @@ const SingleOrder = () => {
                 </Col>
               </Row>
 
-              {/* Style Inspiration (Image) */}
+              {/* Style Inspiration */}
               {order.styleInspo && (
                 <Row className="mb-3">
                   <Col sm="4" className="fw-bold text-dark">
@@ -189,40 +179,30 @@ const SingleOrder = () => {
                         src={order.styleInspo}
                         alt="Style Inspiration"
                         className="img-fluid rounded shadow-lg"
-                        style={{
-                          maxHeight: "400px",
-                          width: "100%",
-                          objectFit: "cover", // Ensures the image covers the space nicely
-                          borderRadius: "12px", // Rounded corners
-                          boxShadow: "0 8px 15px rgba(0, 0, 0, 0.1)", // Subtle shadow
-                          cursor: "pointer", // Change the cursor to indicate clickability
-                        }}
-                        onClick={() => openModal(order.styleInspo)} // Open the image in a modal
+                        style={{ maxHeight: "400px", cursor: "pointer" }}
+                        onClick={() => openModal(order.styleInspo)}
                       />
                     </div>
                   </Col>
                 </Row>
               )}
 
-              {/* Toggle Status Button */}
+              {/* Buttons */}
               <div className="text-center mt-4">
                 <Button
-                  variant="info"
+                  variant="warning"
                   onClick={toggleOrderStatus}
                   className="btn-lg"
+
                 >
                   {order.status === "Completed"
                     ? "Mark as In Progress"
                     : "Mark as Completed"}
                 </Button>
-              </div>
-
-              {/* Delete Order Button */}
-              <div className="text-center mt-4">
                 <Button
                   variant="danger"
                   onClick={toggleConfirmDeleteModal}
-                  className="btn-lg"
+                  className="btn-lg ms-3"
                 >
                   Delete Order
                 </Button>
@@ -232,7 +212,7 @@ const SingleOrder = () => {
         </Col>
       </Row>
 
-      {/* Full-Screen Modal */}
+      {/* Full-Screen Image Modal */}
       <Modal isOpen={modalOpen} toggle={closeModal} size="lg">
         <ModalHeader toggle={closeModal}></ModalHeader>
         <ModalBody>
@@ -241,7 +221,7 @@ const SingleOrder = () => {
               src={imageUrl}
               alt="Style Inspiration"
               className="img-fluid rounded"
-              style={{ maxHeight: "80vh", objectFit: "contain" }} // Keep the image fully visible
+              style={{ maxHeight: "80vh", objectFit: "contain" }}
             />
           </div>
         </ModalBody>
@@ -258,7 +238,7 @@ const SingleOrder = () => {
         </ModalHeader>
         <ModalBody>Are you sure you want to delete this order?</ModalBody>
         <ModalFooter>
-          <Button variant="secondary" onClick={toggleConfirmDeleteModal}>
+          <Button variant="warning" onClick={toggleConfirmDeleteModal}>
             Cancel
           </Button>
           <Button variant="danger" onClick={handleDeleteOrder}>

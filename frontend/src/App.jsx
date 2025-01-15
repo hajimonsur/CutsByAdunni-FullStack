@@ -16,6 +16,9 @@ import PageNotFound from "./components/error/PageNotFound";
 import SingleOrder from "./components/order/SingleOrder";
 import AdminOrder from "./components/order/AdminOrder";
 import Profile from "./components/profile/Profile";
+import AllUsers from "./components/profile/AllUsers";
+import UploadTestimony from "./components/testimony/UploadTestimony";
+import AdminTestimony from "./components/testimony/AdminTestimony";
 
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
@@ -43,6 +46,9 @@ const App = () => {
         <Route path="/order/:id" element={<SingleOrder />} />
         <Route path="/adminOrder" element={<AdminOrder/>}/>
         <Route path="/profile" element={<Profile/>}/>
+        <Route path="/users" element={<AllUsers/>}/>
+        <Route path="/testimony" element={<UploadTestimony/>}/>
+        <Route path="/admintestimony/" element={<AdminTestimony/>}/>
         
         {/* ProtectedRoute for the /admin path */}
         <Route

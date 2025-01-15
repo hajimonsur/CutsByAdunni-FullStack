@@ -1,4 +1,6 @@
 const Order = require("../models/Order");
+// const sendOrderNotification = require('./emailService');
+
 
 // Create a new order
 exports.createOrder = async (req, res) => {
@@ -26,6 +28,10 @@ exports.createOrder = async (req, res) => {
       time,
       status: "pending", // Default status
     });
+
+    // await sendOrderNotification(newOrder);
+
+
 
     res
       .status(201)

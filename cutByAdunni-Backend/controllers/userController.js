@@ -62,3 +62,17 @@ exports.userDetails = async (req, res) => {
     }
 
 };
+
+// view all users (admin)
+exports.viewAllUsers = async (req, res) => {
+  try {
+    if (req.userRole !== "admin") {
+      return res.status(403).json({ message: "Access denied. Admins only." });
+    }
+
+    const users = await User.find();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

@@ -4,7 +4,6 @@ import { FaRuler, FaPalette, FaTruck } from "react-icons/fa";
 import Accordion from "react-bootstrap/Accordion";
 import { Widget } from "@uploadcare/react-widget";
 
-
 const OrderPage = () => {
   const styles = {
     hero: {
@@ -72,7 +71,7 @@ const OrderPage = () => {
   const [styleInspo, setStyleInspo] = useState([]);
 
   const pubKey = import.meta.env.VITE_REACT_APP_UPLOADCARE_PUBLIC_KEY;
-
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   const handleClear = () => {
     setName("");
@@ -81,35 +80,30 @@ const OrderPage = () => {
     setMeasurements("");
     setAdditionalNotes("");
     setStyleInspo([]);
-    
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/orders`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-          body: JSON.stringify({
-            customerName: name,
-            email,
-            fabricDetails,
-            measurements,
-            additionalNotes,
-            styleInspo: styleInspo,
-          }),
-        }
-      );
+      const response = await fetch(`${apiUrl}/api/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+        body: JSON.stringify({
+          customerName: name,
+          email,
+          fabricDetails,
+          measurements,
+          additionalNotes,
+          styleInspo: styleInspo,
+        }),
+      });
 
       if (response.ok) {
         alert("Order submitted successfully!");
         handleClear();
-        window.location.reload();
       } else {
         alert("Failed to submit order. Please try again.");
       }
@@ -145,7 +139,9 @@ const OrderPage = () => {
           <div className={styles.step}>
             <FaPalette style={styles.icon} />
             <h4>Step 2: Choose Your Style</h4>
-            <p>Select your preferred design from our catalog or share your own.</p>
+            <p>
+              Select your preferred design from our catalog or share your own.
+            </p>
           </div>
           <div className={styles.step}>
             <FaTruck style={styles.icon} />
@@ -215,7 +211,9 @@ const OrderPage = () => {
 
                   // Update state with the single image URL
                   setStyleInspo([url]); // Use an array to stay consistent if your state expects multiple images
-                  {console.log(url)}
+                  {
+                    console.log(url);
+                  }
                 }}
               />
             </div>

@@ -23,7 +23,7 @@ function NavComp() {
       const role = localStorage.getItem("role");
       setUserRole(role);
 
-      setUserName(user ? JSON.parse(user).name : "");
+      setUserName(user ? JSON.parse(user).username : "");
     }
   }, []);
 
@@ -58,8 +58,8 @@ function NavComp() {
               navbarScroll
             >
               <Nav.Link href="/">Home</Nav.Link>
-              <Nav.Link href="/admin">Dashboard</Nav.Link>
               <Nav.Link href="/portfolio">Portfolio</Nav.Link>
+              <Nav.Link href="/admin">Dashboard</Nav.Link>
             </Nav>
           ) : (
             <Nav
@@ -68,9 +68,11 @@ function NavComp() {
               navbarScroll
             >
               <Nav.Link href="/">Home</Nav.Link>
-              <Nav.Link href="/contact">Contact</Nav.Link>
-              <Nav.Link href="/order">Order</Nav.Link>
               <Nav.Link href="/portfolio">Portfolio</Nav.Link>
+              <Nav.Link href="/order">Order</Nav.Link>
+              <Nav.Link href="/contact">Contact</Nav.Link>
+             
+             
             </Nav>
           )}
 
