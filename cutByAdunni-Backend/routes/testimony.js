@@ -8,7 +8,10 @@ const router = express.Router();
 router.post("/", auth, createTestimony);
 
 // Admin route to get all testimonies
-router.get("/", auth, getAllTestimonies);
+router.get("/",  getAllTestimonies);
+
+
+
 
 // Admin route to get specific user testimonies
 router.get("/user/:id", auth, getUserTestimonies);

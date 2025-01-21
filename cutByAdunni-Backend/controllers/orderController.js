@@ -1,5 +1,5 @@
 const Order = require("../models/Order");
-const sendOrderNotification = require('../emailService');
+const {sendOrderNotification} = require('../emailService');
 
 
 // Create a new order
@@ -29,13 +29,7 @@ exports.createOrder = async (req, res) => {
       status: "pending", // Default status
     });
 
-   
     await sendOrderNotification(newOrder);
-
-
-
-
-
     res
       .status(201)
       .json({ message: "Order created successfully", data: newOrder });
@@ -75,7 +69,7 @@ exports.viewSingleOrder = async (req, res) => {
       return res.status(403).json({ message: "Access denied. Admins only." });
     }
 
-    const { id } = req.params; // Assuming orderId is passed as a URL parameter
+    const { id } = req.params; 
 
     // Find the order by its ID in the database
     const order = await Order.findById(id);

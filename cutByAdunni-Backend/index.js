@@ -10,11 +10,7 @@ connectDB();
 const app = express();
 
 
-app.use(cors(
-    {
-        origin: 'http://localhost:5173',
-    }
-));
+app.use(cors());
 
 // Middleware
 app.use(express.json());
@@ -25,6 +21,7 @@ app.use("/api/orders", require("./routes/orders"));
 app.use("/api/portfolio", require("./routes/portfolio"));
 app.use("/api/users", require("./routes/users"));
 app.use("/api/testimony", require("./routes/testimony"));
+app.use("/api/contact", require("./routes/contacts"));
 
 
 

@@ -1,5 +1,5 @@
 const express = require("express");
-const { login, signup, userDetails, viewAllUsers } = require("../controllers/userController");
+const { login, signup, userDetails, viewAllUsers, resetPassword } = require("../controllers/userController");
 const auth = require("../middleware/auth");
 
 const router = express.Router();
@@ -7,6 +7,7 @@ const router = express.Router();
 // Public Routes
 router.post("/register", signup);
 router.post("/login", login);
+router.post("/reset-password", resetPassword);
 
 
 // Protected Routes
