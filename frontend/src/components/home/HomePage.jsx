@@ -22,15 +22,18 @@ const HomePage = () => {
     message: "",
   });
   const [showAlert, setShowAlert] = useState(false);
-
   useEffect(() => {
     const fetchPortfolio = async () => {
       try {
         const response = await fetch(`${apiUrl}/api/portfolio`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch portfolio items");
+        }
         const data = await response.json();
         setPortfolioItems(data);
       } catch (error) {
         console.error("Error fetching portfolio items:", error);
+        setPortfolioItems([]); // Fallback to an empty array
       }
     };
 
@@ -44,13 +47,16 @@ const HomePage = () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
         });
+        if (!response.ok) {
+          throw new Error("Failed to fetch testimonies");
+        }
         const data = await response.json();
         setTestimony(data);
       } catch (error) {
         console.error("Error fetching testimony:", error);
+        setTestimony([]); // Fallback to an empty array
       }
     };
 
@@ -114,46 +120,61 @@ const HomePage = () => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
-          {portfolioItems.map((item) => (
-            <motion.div
-              key={item.id}
-              className="portfolio-item"
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
-            >
-              <img
-                src={item.images}
-                alt={item.title}
-                className="portfolio-image"
-              />
-              <div className="portfolio-overlay">
-                <h5>{item.title}</h5>
-                <p>{item.description}</p>
-              </div>
-            </motion.div>
-          ))}
+          {portfolioItems.length > 0 ? (
+            portfolioItems.map((item) => (
+              <motion.div
+                key={item._id}
+                className="portfolio-item"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              >
+                <img
+                  src={item.images}
+                  alt={item.title}
+                  className="portfolio-image"
+                />
+                <div className="portfolio-overlay">
+                  <h5>{item.title}</h5>
+                  <p>{item.description}</p>
+                </div>
+              </motion.div>
+            ))
+          ) : (
+            <p className="text-center">
+              No portfolio items available at the moment.
+            </p>
+          )}
         </motion.div>
       </section>
 
       {/* Testimonials Section */}
       <section className="py-5 bg-light text-dark">
-  <h2 className="text-center mb-4">What Our Clients Say</h2>
-  <div className="container">
-    <div className="row justify-content-center">
-      {testimony.map((item) => (
-        <div key={item.id} className="col-12 col-md-6 col-lg-4 mb-4">
-          <div className="card shadow-sm border-0 rounded">
-            <div className="card-body">
-              <p className="card-text mb-4 text-muted">{item.testimony}</p>
-              <h5 className="card-title text-dark font-weight-bold">{item.name}</h5>
-            </div>
+        <h2 className="text-center mb-4">What Our Clients Say</h2>
+        <div className="container">
+          <div className="row justify-content-center">
+            {testimony.length > 0 ? (
+              testimony.map((item) => (
+                <div key={item._id} className="col-12 col-md-6 col-lg-4 mb-4">
+                  <div className="card shadow-sm border-0 rounded">
+                    <div className="card-body">
+                      <p className="card-text mb-4 text-muted">
+                        {item.testimony}
+                      </p>
+                      <h5 className="card-title text-dark font-weight-bold">
+                        {item.name}
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-center">
+                No testimonials available at the moment.
+              </p>
+            )}
           </div>
         </div>
-      ))}
-    </div>
-  </div>
-</section>
-
+      </section>
 
       {/* Contact Section */}
       {/* <section className="py-5 text-dark">
@@ -222,7 +243,7 @@ const HomePage = () => {
           </div>
         </div>
       </section> */}
-      <UploadTestimony/>
+      <UploadTestimony />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import  { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -15,41 +15,41 @@ const Login = () => {
     setPassword("");
   };
 
+  const apiUrl = import.meta.env.VITE_API_URL;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Call API to handle login with email and password
-    try {
-        const response = await fetch(`http://localhost:5000/api/users/login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        body: JSON.stringify({  email, password }),
-        });
-  
-        if (response.ok) {
-          const data = await response.json();
-          const { authToken, user, role, loggedIn } = data;
-  
-          localStorage.setItem("authToken", authToken);
-          localStorage.setItem("user", JSON.stringify(user));
-          localStorage.setItem("role", role);
-          localStorage.setItem("loggedIn", loggedIn);
-          alert("Login successful!");
-          handleClear();
-          if (role === "admin") {
-            navigate("/admin");
-          } else {
-            navigate("/");
-          }
-          
-        } else {
-          alert("Login failed. Please check your credentials.");
-        }
-      } catch (error) {
-        console.error("Error logging in:", error);
-      } 
 
+    try {
+      const response = await fetch(`${apiUrl}/api/users/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ identifier: email, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const { authToken, user, role, loggedIn } = data;
+
+        localStorage.setItem("authToken", authToken);
+        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("role", role);
+        localStorage.setItem("loggedIn", loggedIn);
+        alert("Login successful!");
+        handleClear();
+        if (role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
+      } else {
+        alert("Login failed. Please check your credentials.");
+      }
+    } catch (error) {
+      console.error("Error logging in:", error);
+    }
   };
 
   return (
@@ -61,16 +61,16 @@ const Login = () => {
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
                 <label htmlFor="email" className="form-label">
-                  Email address
+                  Email Address or Username
                 </label>
                 <input
-                  type="email"
+                  type="text"
                   className="form-control"
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  placeholder="Enter your email"
+                  placeholder="Enter your email or username"
                 />
               </div>
               <div className="mb-3">
@@ -93,7 +93,10 @@ const Login = () => {
             </form>
             <div className="text-center mt-3">
               <p>
-                Don't have an account? <a href="/signup">Sign up</a>
+                Don't have an account? <Link to="/signup" style={{ textDecoration: "none" }}>Sign up</Link>
+              </p>
+              <p>
+                <Link to="/resetpassword" style={{ textDecoration: "none" }}>Forgot Password?</Link>
               </p>
             </div>
           </div>

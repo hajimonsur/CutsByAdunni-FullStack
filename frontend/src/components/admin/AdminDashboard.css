@@ -4,6 +4,30 @@
     padding: 20px;
     border-right: 1px solid #ddd;
   }
+
+  .sidebar-col {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    padding-top: 20px;
+  }
+  
+  .dashboard-col {
+    padding: 20px;
+  }
+  
+  .order-card {
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+  }
+  
+  .order-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .welcome-card {
+    background-color: #e9ecef;
+  }
+  
   
   .dashboard-col {
     padding: 20px;

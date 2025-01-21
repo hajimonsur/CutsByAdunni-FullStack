@@ -1,41 +1,97 @@
 import React from "react";
 import Accordion from "react-bootstrap/Accordion";
+import { useState } from "react";
 
 const ContactPage = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+
+  const apiUrl = import.meta.env.VITE_API_URL;
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(`${apiUrl}/api/contact`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, message }),
+      });
+      if (response.ok) {
+        alert("Message sent successfully!");
+        setName("");
+        setEmail("");
+        setMessage("");
+      } else {
+        alert("Failed to send message. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      alert("Error sending message. Please try again.");
+    }
+  };
+
   return (
     <div>
       {/* Hero Section */}
       <section
         style={{
-          padding: "50px 20px",
-          backgroundColor: "#6c757d",
+          padding: "80px 20px",
+          backgroundColor: "#343a40",
           color: "#fff",
+          textAlign: "center",
         }}
       >
-        <h1 className="text-center">Get in Touch with Us</h1>
-        <p className="text-center">
+        <h1 className="display-4">Get in Touch with Us</h1>
+        <p className="lead">
           We'd love to hear from you! Whether you have questions or just want to
           say hello, reach out to us.
         </p>
       </section>
 
       {/* Contact Form */}
-      <section style={{ padding: "50px 0", backgroundColor: "#f8f9fa" }}>
-        <h2 className="text-center mb-4">Contact Us</h2>
-        <form className="mt-4 mx-auto" style={{ maxWidth: "600px" }}>
-          <div className="mb-3">
+      <section
+        style={{
+          padding: "60px 20px",
+          backgroundColor: "#f8f9fa",
+        }}
+      >
+        <h2 className="text-center mb-5">Contact Us</h2>
+        <form
+          className="mx-auto"
+          style={{ maxWidth: "600px" }}
+          onSubmit={handleContactSubmit}
+        >
+          <div className="mb-4">
             <label htmlFor="name" className="form-label">
               Name
             </label>
-            <input type="text" className="form-control" id="name" required />
+            <input
+              type="text"
+              className="form-control"
+              id="name"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
           </div>
-          <div className="mb-3">
+          <div className="mb-4">
             <label htmlFor="email" className="form-label">
               Email
             </label>
-            <input type="email" className="form-control" id="email" required />
+            <input
+              type="email"
+              className="form-control"
+              id="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
-          <div className="mb-3">
+          <div className="mb-4">
             <label htmlFor="message" className="form-label">
               Message
             </label>
@@ -44,21 +100,23 @@ const ContactPage = () => {
               id="message"
               rows="4"
               required
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
             ></textarea>
           </div>
-          <button type="submit" className="btn btn-warning w-100">
+          <button type="submit" className="btn btn-warning w-100 py-3">
             Send Message
           </button>
         </form>
       </section>
 
       {/* Our Location & Map Section */}
-      <section style={{ padding: "50px 20px", backgroundColor: "#e9ecef" }}>
-        <h2 className="text-center mb-4">Our Location</h2>
+      <section style={{ padding: "60px 20px", backgroundColor: "#e9ecef" }}>
+        <h2 className="text-center mb-5">Our Location</h2>
         <div className="container text-center">
           <iframe
             title="Location Map"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126045.72811624776!2d3.3668696!3d6.4973814!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b8c687e554013%3A0xf8d2d7c4bd02d6b!2sOyingbo%2C%20Lagos%2C%20Nigeria!5e0!3m2!1sen!2sng!4v1697072068984!5m2!1sen!2sng"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3939.9685626592875!2d3.4035094749309774!3d6.453779095973506!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b8c6d926a2fd5%3A0xe90f2f4b6a86bcb4!2sSandgrouse%20Market%2C%20Lewis%20St%2C%20Lagos%20Island!5e0!3m2!1sen!2sng!4v1702734511023!5m2!1sen!2sng"
             width="100%"
             height="400"
             style={{ border: "0" }}
@@ -69,19 +127,19 @@ const ContactPage = () => {
       </section>
 
       {/* Contact Details & Social Media */}
-      <section style={{ padding: "50px 20px" }}>
+      <section style={{ padding: "60px 20px", backgroundColor: "#fff" }}>
         <div className="container">
           <div className="row">
-            <div className="col-md-4 text-center">
+            <div className="col-md-4 text-center mb-4 mb-md-0">
               <h4>Phone</h4>
               <a href="tel:+2348135881858" className="d-block">
-                (+234)8135881858
+                (+234) 8135881858
               </a>
             </div>
-            <div className="col-md-4 text-center">
+            <div className="col-md-4 text-center mb-4 mb-md-0">
               <h4>Email</h4>
               <a href="mailto:contact@cutbyadunni.com" className="d-block">
-                contact@cutbyadunni.com
+                cutsbyadunni@gmail.com
               </a>
             </div>
             <div className="col-md-4 text-center">
@@ -118,9 +176,9 @@ const ContactPage = () => {
       </section>
 
       {/* FAQ Section */}
-      <section style={{ padding: "50px 20px", backgroundColor: "#f8f9fa" }}>
-        <h2 className="text-center mb-4">Frequently Asked Questions</h2>
-        <Accordion className="container mx-auto">
+      <section style={{ padding: "60px 20px", backgroundColor: "#f8f9fa" }}>
+        <h2 className="text-center mb-5">Frequently Asked Questions</h2>
+        <Accordion>
           <Accordion.Item eventKey="0">
             <Accordion.Header>
               How long does it take to receive my order?

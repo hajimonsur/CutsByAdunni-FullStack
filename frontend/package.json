@@ -19,6 +19,7 @@
     "cloudinary": "^2.5.1",
     "cloudinary-react": "^1.8.1",
     "framer-motion": "^11.15.0",
+    "jwt-decode": "^4.0.0",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.7",
     "react-dom": "^18.3.1",

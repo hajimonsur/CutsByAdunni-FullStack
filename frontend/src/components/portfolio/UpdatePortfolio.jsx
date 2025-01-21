@@ -1,19 +1,58 @@
-import React from "react";
-import { Widget } from "@uploadcare/react-widget";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
+import React, { useState } from "react";
+import { Button, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useState, useEffect } from "react";
 
 const UpdatePortfolio = () => {
-  const [images, setImages] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [error, setError] = useState(null);
+  const [media, setMedia] = useState([]); // Store media URLs
 
-  const pubKey = import.meta.env.VITE_REACT_APP_UPLOADCARE_PUBLIC_KEY;
+  const cloudName = import.meta.env.VITE_REACT_APP_CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = import.meta.env.VITE_REACT_APP_CLOUDINARY_UPLOAD_PRESET;
   const apiUrl = import.meta.env.VITE_API_URL;
+
+  // Handle file input change to upload media
+  const handleFileChange = async (e) => {
+    const files = e.target.files;
+  
+    if (files.length > 0) {
+      try {
+        // For each file, upload to Cloudinary and update the media state immediately
+        for (let file of files) {
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("upload_preset", `${uploadPreset}`);
+  
+          const resourceType = file.type.startsWith("video")
+            ? "video"
+            : "image";
+  
+          const response = await fetch(
+            `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+  
+          if (response.ok) {
+            const data = await response.json();
+            console.log(`Uploaded ${file.name}: ${data.secure_url}`); // Debugging the URL
+  
+            // Immediately update the media state with the new URL
+            setMedia((prevMedia) => [...prevMedia, data.secure_url]);
+          } else {
+            console.error("Failed to upload file:", file.name);
+          }
+        }
+      } catch (error) {
+        console.error("Error uploading files to Cloudinary:", error);
+      }
+    }
+  };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,7 +68,7 @@ const UpdatePortfolio = () => {
           title,
           description,
           category,
-          images,
+          images: media,
         }),
       });
 
@@ -50,7 +89,7 @@ const UpdatePortfolio = () => {
     setTitle("");
     setDescription("");
     setCategory("");
-    setImages([]);
+    setMedia([]);
   };
 
   return (
@@ -83,30 +122,41 @@ const UpdatePortfolio = () => {
               />
             </Form.Group>
 
-            <div className="mb-3">
-              <label
-                htmlFor="uploadcareUploader"
-                className="form-label d-block mb-2"
-              >
-                Upload Images
-              </label>
-              <Widget
-                publicKey={pubKey}
-                multiple={false} // Disable multiple file selection
-                onChange={(fileInfo) => {
-                  // Extract the URL for the single uploaded file
-                  const url = fileInfo.cdnUrl;
+            {/* Media Upload */}
+            <Form.Group className="mb-3">
+              <Form.Label>Upload Media (Images & Videos)</Form.Label>
+              <Form.Control type="file" multiple onChange={handleFileChange} />
+            </Form.Group>
 
-                  // Update state with the single image URL
-                  setImages([url]); // Use an array to stay consistent if your state expects multiple images
-                }}
-              />
+            {/* Display Uploaded Media */}
+            <div className="mb-3">
+              <h5>Uploaded Media:</h5>
+              <div className="d-flex flex-wrap">
+                {media.map((url, index) => (
+                  <div key={index} className="me-3 mb-3">
+                    {url.endsWith(".mp4") || url.endsWith(".mov") ? (
+                      <video width="150" height="150" controls>
+                        <source src={url} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                    ) : (
+                      <img
+                        src={url}
+                        alt={`uploaded-media-${index}`}
+                        width="150"
+                        height="150"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
 
+            {/* Category Selection */}
             <Form.Group className="mb-3">
               <Form.Label>Category</Form.Label>
               <Form.Select
-                aria-label="Default select example"
+                aria-label="Select category"
                 className="shadow-sm"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
@@ -120,6 +170,7 @@ const UpdatePortfolio = () => {
               </Form.Select>
             </Form.Group>
 
+            {/* Submit Button */}
             <div className="d-grid">
               <Button
                 variant="warning"
@@ -130,6 +181,9 @@ const UpdatePortfolio = () => {
               </Button>
             </div>
           </Form>
+
+          {/* Error Message */}
+          {error && <div className="alert alert-danger mt-3">{error}</div>}
         </div>
       </div>
     </div>

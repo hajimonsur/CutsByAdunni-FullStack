@@ -1,18 +1,18 @@
 import React, { useState } from "react";
-import { Form, Button, Card } from "react-bootstrap";
+import { Form, Button } from "react-bootstrap";
 import { FaRuler, FaPalette, FaTruck } from "react-icons/fa";
-import Accordion from "react-bootstrap/Accordion";
-import { Widget } from "@uploadcare/react-widget";
 
 const OrderPage = () => {
   const styles = {
     hero: {
       padding: "50px 20px",
       textAlign: "center",
+      backgroundColor: "#f1f1f1",
+      borderRadius: "8px",
+      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
     },
     section: {
       padding: "40px 20px",
-      // backgroundColor: "#fff8e1", // Soft background color for a warm, inviting feel
       borderRadius: "10px",
       boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
       margin: "2rem auto",
@@ -23,43 +23,29 @@ const OrderPage = () => {
       margin: "0 auto",
     },
     icon: {
-      fontSize: "60px", // Increase icon size
-      color: "#FFC107", // Highlight icon color
+      fontSize: "60px",
+      color: "#FFC107",
+      marginBottom: "15px",
     },
     stepContainer: {
       display: "flex",
       justifyContent: "center",
       flexWrap: "wrap",
       marginTop: "30px",
-      gap: "2rem", // Added gap for better spacing
-    },
-    step: {
-      textAlign: "center",
-      margin: "20px",
-      maxWidth: "300px",
-      padding: "20px",
-      borderRadius: "10px",
-      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-      backgroundColor: "#f8f9fa",
-      transition: "transform 0.3s ease, box-shadow 0.3s ease",
-      cursor: "pointer",
-      "&:hover": {
-        transform: "scale(1.05)",
-        boxShadow: "0 8px 12px rgba(0, 0, 0, 0.2)",
-      },
+      gap: "2rem",
     },
     galleryImage: {
-      width: "30%",
-      margin: "10px",
-      borderRadius: "10px",
+      width: "100px",
+      height: "100px",
+      objectFit: "cover",
+      margin: "5px",
+      borderRadius: "8px",
     },
-    faqCard: {
-      marginBottom: "10px",
-      border: "none",
-      backgroundColor: "#f8f9fa",
-    },
-    faqHeading: {
-      fontWeight: "bold",
+    videoPlayer: {
+      width: "100px",
+      height: "auto",
+      margin: "5px",
+      borderRadius: "8px",
     },
   };
 
@@ -70,8 +56,10 @@ const OrderPage = () => {
   const [additionalNotes, setAdditionalNotes] = useState("");
   const [styleInspo, setStyleInspo] = useState([]);
 
-  const pubKey = import.meta.env.VITE_REACT_APP_UPLOADCARE_PUBLIC_KEY;
+  const cloudName = import.meta.env.VITE_REACT_APP_CLOUDINARY_CLOUD_NAME;
   const apiUrl = import.meta.env.VITE_API_URL;
+  const uploadPreset = import.meta.env.VITE_REACT_APP_CLOUDINARY_UPLOAD_PRESET;
+
 
   const handleClear = () => {
     setName("");
@@ -97,7 +85,7 @@ const OrderPage = () => {
           fabricDetails,
           measurements,
           additionalNotes,
-          styleInspo: styleInspo,
+          styleInspo,
         }),
       });
 
@@ -113,9 +101,46 @@ const OrderPage = () => {
     }
   };
 
+  const handleFileChange = async (e) => {
+    const files = e.target.files;
+    const uploadedUrls = [];
+
+    if (files.length > 0) {
+      try {
+        for (let file of files) {
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("upload_preset", `${uploadPreset}`);
+
+          const resourceType = file.type.startsWith("video")
+            ? "video"
+            : "image";
+
+          const response = await fetch(
+            `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            uploadedUrls.push(data.secure_url);
+          } else {
+            console.error("Failed to upload file:", file.name);
+          }
+        }
+
+        setStyleInspo((prev) => [...prev, ...uploadedUrls]);
+      } catch (error) {
+        console.error("Error uploading files to Cloudinary:", error);
+      }
+    }
+  };
+
   return (
     <div>
-      {/* Hero Section */}
       <section style={styles.hero}>
         <h1>Place Your Custom Order</h1>
         <p>
@@ -127,31 +152,6 @@ const OrderPage = () => {
         </Button>
       </section>
 
-      {/* Order Steps */}
-      <section style={styles.section}>
-        <h2 className="text-center mb-5">How It Works</h2>
-        <div style={styles.stepContainer}>
-          <div className={styles.step}>
-            <FaRuler style={styles.icon} />
-            <h4>Step 1: Provide Measurements</h4>
-            <p>Share your exact body measurements for a perfect fit.</p>
-          </div>
-          <div className={styles.step}>
-            <FaPalette style={styles.icon} />
-            <h4>Step 2: Choose Your Style</h4>
-            <p>
-              Select your preferred design from our catalog or share your own.
-            </p>
-          </div>
-          <div className={styles.step}>
-            <FaTruck style={styles.icon} />
-            <h4>Step 3: Receive Your Outfit</h4>
-            <p>We’ll deliver your custom-made outfit to your doorstep.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Customization Form */}
       <section id="customize-order-section" style={styles.section}>
         <h2 className="text-center">Customize Your Order</h2>
         <div style={styles.formContainer}>
@@ -195,27 +195,43 @@ const OrderPage = () => {
                 onChange={(e) => setMeasurements(e.target.value)}
               />
             </Form.Group>
+
             <div className="mb-3">
-              <label
-                htmlFor="uploadcareUploader"
-                className="form-label d-block mb-2"
-              >
+              <label htmlFor="upload" className="form-label d-block mb-2">
                 <b>Upload Style Inspo</b>
               </label>
-              <Widget
-                publicKey={pubKey}
-                multiple={false} // Disable multiple file selection
-                onChange={(fileInfo) => {
-                  // Extract the URL for the single uploaded file
-                  const url = fileInfo.cdnUrl;
-
-                  // Update state with the single image URL
-                  setStyleInspo([url]); // Use an array to stay consistent if your state expects multiple images
-                  {
-                    console.log(url);
-                  }
-                }}
+              <input
+                type="file"
+                id="upload"
+                multiple
+                accept="image/*, video/*"
+                onChange={handleFileChange}
               />
+              {styleInspo.length > 0 && (
+                <div className="mt-2">
+                  <strong>Uploaded Files:</strong>
+                  <div className="d-flex flex-wrap">
+                    {styleInspo.map((url, index) => {
+                      const isVideo = url.includes("video");
+                      return isVideo ? (
+                        <video
+                          key={index}
+                          src={url}
+                          controls
+                          style={styles.videoPlayer}
+                        />
+                      ) : (
+                        <img
+                          key={index}
+                          src={url}
+                          alt={`Uploaded style ${index + 1}`}
+                          style={styles.galleryImage}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             <Form.Group controlId="notes">
@@ -234,58 +250,6 @@ const OrderPage = () => {
             </Button>
           </Form>
         </div>
-      </section>
-
-      {/* Gallery Section */}
-      <section style={styles.section}>
-        <h2 className="text-center">Get Inspired</h2>
-        <div className="d-flex justify-content-center flex-wrap">
-          <img
-            src="./images/gallery1.jpg"
-            alt="Gallery 1"
-            style={styles.galleryImage}
-          />
-          <img
-            src="./images/gallery2.jpg"
-            alt="Gallery 2"
-            style={styles.galleryImage}
-          />
-          <img
-            src="./images/gallery3.jpg"
-            alt="Gallery 3"
-            style={styles.galleryImage}
-          />
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section style={styles.section}>
-        <h2 className="text-center">Frequently Asked Questions</h2>
-        <Accordion className="container mx-auto">
-          <Accordion.Item eventKey="0">
-            <Accordion.Header>
-              How long does it take to receive my order?
-            </Accordion.Header>
-            <Accordion.Body>
-              Our typical turnaround time is 7-14 business days.
-            </Accordion.Body>
-          </Accordion.Item>
-          <Accordion.Item eventKey="1">
-            <Accordion.Header>Can I provide my own design?</Accordion.Header>
-            <Accordion.Body>
-              Yes, absolutely! You can upload your design during the order
-              process.
-            </Accordion.Body>
-          </Accordion.Item>
-          <Accordion.Item eventKey="2">
-            <Accordion.Header>
-              What if the outfit doesn’t fit perfectly?
-            </Accordion.Header>
-            <Accordion.Body>
-              We offer free alterations to ensure your complete satisfaction.
-            </Accordion.Body>
-          </Accordion.Item>
-        </Accordion>
       </section>
     </div>
   );

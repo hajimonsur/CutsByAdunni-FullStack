@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import {isTokenExpired} from "./components/AuthUtility";
 import NavComp from "./components/Header";
 import Splash from "./components/splash/Splash";
 import HomePage from "./components/home/HomePage";
@@ -19,10 +20,13 @@ import Profile from "./components/profile/Profile";
 import AllUsers from "./components/profile/AllUsers";
 import UploadTestimony from "./components/testimony/UploadTestimony";
 import AdminTestimony from "./components/testimony/AdminTestimony";
+import ProjectDetailPage from "./components/portfolio/ProjectDetailPage";
+import ResetPassword from "./components/authentication/ResetPassword";
 
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
-  
+  const navigate = useNavigate();
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowSplash(false);
@@ -30,40 +34,64 @@ const App = () => {
     return () => clearTimeout(timer); // Cleanup timer
   }, []);
 
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+
+    // Periodically check if the token is expired
+    const checkToken = () => {
+      if (token && isTokenExpired(token)) {
+        // Redirect to login if token is expired
+        navigate("/login");
+      }
+    };
+
+    // Run check immediately
+    checkToken();
+
+    // Optionally, set an interval to keep checking (e.g., every 1 minute)
+    const interval = setInterval(checkToken, 60000);
+
+    return () => clearInterval(interval); // Cleanup interval on unmount
+  }, [navigate]);
+
   return (
     <div>
-      {showSplash ? <Splash /> :   <div>
-      <NavComp />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/order" element={<OrderPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/portfolio" element={<PortfolioPage />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/update" element={<UpdatePortfolio />} />
-        <Route path="*" element={<PageNotFound />} />
-        <Route path="/order/:id" element={<SingleOrder />} />
-        <Route path="/adminOrder" element={<AdminOrder/>}/>
-        <Route path="/profile" element={<Profile/>}/>
-        <Route path="/users" element={<AllUsers/>}/>
-        <Route path="/testimony" element={<UploadTestimony/>}/>
-        <Route path="/admintestimony/" element={<AdminTestimony/>}/>
-        
-        {/* ProtectedRoute for the /admin path */}
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute>
-              <AdminDashboard /> {/* Protected component */}
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-      <Footer />
-      </div>}
-    
-    
+      {showSplash ? (
+        <Splash />
+      ) : (
+        <div>
+          <NavComp />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/order" element={<OrderPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/portfolio" element={<PortfolioPage />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/update" element={<UpdatePortfolio />} />
+            <Route path="*" element={<PageNotFound />} />
+            <Route path="/order/:id" element={<SingleOrder />} />
+            <Route path="/adminOrder" element={<AdminOrder />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/users" element={<AllUsers />} />
+            <Route path="/testimony" element={<UploadTestimony />} />
+            <Route path="/admintestimony/" element={<AdminTestimony />} />
+            <Route path="/project/:id" element={<ProjectDetailPage />} />
+            <Route path="/resetpassword" element={<ResetPassword />} />
+
+            {/* ProtectedRoute for the /admin path */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminDashboard /> {/* Protected component */}
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+          <Footer />
+        </div>
+      )}
     </div>
   );
 };

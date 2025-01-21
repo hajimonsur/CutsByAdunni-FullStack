@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -9,7 +9,7 @@ const Signup = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [role, setRole] = useState('customer');
+  // const [role, setRole] = useState('customer');
 
   const handleClear = () => {
     setEmail('');
@@ -17,16 +17,19 @@ const Signup = () => {
     setPassword('');
     setName('');
   }
+
+  const apiUrl = import.meta.env.VITE_API_URL;
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Call API to handle signup with email, username, and password
+
+   
     try {
-      const response = await fetch('http://localhost:5000/api/users/register', {
+      const response = await fetch(`${apiUrl}/api/users/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email, username, password, role }),
+        body: JSON.stringify({ name, email, username, password }),
       });
 
       if (response.ok) {
@@ -108,7 +111,7 @@ const Signup = () => {
                   placeholder="Enter your password"
                 />
               </div>
-              <div className="mb-3">
+              {/* <div className="mb-3">
                 <label htmlFor="role" className="form-label">
                   Role
                 </label>
@@ -121,7 +124,7 @@ const Signup = () => {
               
                   placeholder="Choose a role"
                 />
-              </div>
+              </div> */}
              
               <button type="submit" className="btn btn-warning w-100">
                 Sign Up
@@ -129,7 +132,7 @@ const Signup = () => {
             </form>
             <div className="text-center mt-3">
               <p>
-                Already have an account? <a href="/login">Login</a>
+                Already have an account? <a href="/login">Login!</a>
               </p>
             </div>
           </div>

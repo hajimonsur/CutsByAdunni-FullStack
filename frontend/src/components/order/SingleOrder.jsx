@@ -12,7 +12,7 @@ import {
   ModalBody,
   ModalFooter,
 } from "reactstrap";
-import { Button } from "react-bootstrap";
+import { Button, Carousel } from "react-bootstrap";
 
 const SingleOrder = () => {
   const { id } = useParams(); // Extract the order ID from the URL
@@ -21,8 +21,8 @@ const SingleOrder = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false); // Modal state for image
-  const [imageUrl, setImageUrl] = useState("");
+  const [modalOpen, setModalOpen] = useState(false); // Modal state for image/video
+  const [mediaUrl, setMediaUrl] = useState("");
   const [confirmDeleteModal, setConfirmDeleteModal] = useState(false); // Delete confirmation modal state
   const apiUrl = import.meta.env.VITE_API_URL; // Environment variable for API base URL
 
@@ -40,6 +40,7 @@ const SingleOrder = () => {
         if (!response.ok) throw new Error("Failed to fetch order details");
 
         const data = await response.json();
+        console.log(data);
         setOrder(data);
         setLoading(false);
       } catch (err) {
@@ -51,13 +52,13 @@ const SingleOrder = () => {
     fetchOrderDetails();
   }, [id, apiUrl]);
 
-  // Open the full-screen modal for the image
-  const openModal = (image) => {
-    setImageUrl(image);
+  // Open the full-screen modal for the image or video
+  const openModal = (media) => {
+    setMediaUrl(media);
     setModalOpen(true);
   };
 
-  // Close the image modal
+  // Close the media modal
   const closeModal = () => {
     setModalOpen(false);
   };
@@ -74,7 +75,7 @@ const SingleOrder = () => {
 
       if (!response.ok) throw new Error("Failed to delete order");
 
-      navigate("/admin"); // Redirect to dashboard on success
+      navigate("/adminOrder");
     } catch (err) {
       setError(err.message);
     }
@@ -116,18 +117,6 @@ const SingleOrder = () => {
 
   return (
     <Container className="mt-5">
-      {/* <Row className="mb-4">
-        <Col>
-          <Button
-            variant="warning"
-            onClick={() => navigate("/admin")}
-            className="btn-lg shadow-lg"
-          >
-            Back to Dashboard
-          </Button>
-        </Col>
-      </Row> */}
-
       <Row>
         <Col md="8" className="mx-auto">
           <Card className="shadow-lg border-0 rounded-lg p-4">
@@ -168,20 +157,50 @@ const SingleOrder = () => {
               </Row>
 
               {/* Style Inspiration */}
-              {order.styleInspo && (
+              {order.styleInspo && order.styleInspo.length > 0 && (
                 <Row className="mb-3">
                   <Col sm="4" className="fw-bold text-dark">
                     Style Inspiration:
                   </Col>
                   <Col>
                     <div className="text-center">
-                      <img
-                        src={order.styleInspo}
-                        alt="Style Inspiration"
-                        className="img-fluid rounded shadow-lg"
-                        style={{ maxHeight: "400px", cursor: "pointer" }}
-                        onClick={() => openModal(order.styleInspo)}
-                      />
+                      <Carousel>
+                        {order.styleInspo.map((url, index) => {
+                          const isVideo =
+                            url.endsWith(".mp4") ||
+                            url.endsWith(".mov") ||
+                            url.endsWith(".avi");
+                          return (
+                            <Carousel.Item key={index}>
+                              {isVideo ? (
+                                <video
+                                  controls
+                                  className="d-block w-100 img-fluid rounded shadow-lg"
+                                  style={{
+                                    maxHeight: "400px",
+                                    objectFit: "contain",
+                                  }}
+                                  onClick={() => openModal(url)}
+                                >
+                                  <source src={url} type="video/mp4" />
+                                  Your browser does not support the video tag.
+                                </video>
+                              ) : (
+                                <img
+                                  src={url}
+                                  alt={`Style Inspiration ${index + 1}`}
+                                  className="d-block w-100 img-fluid rounded shadow-lg"
+                                  style={{
+                                    maxHeight: "400px",
+                                    objectFit: "contain",
+                                  }}
+                                  onClick={() => openModal(url)} // Pass the clicked image URL to the modal
+                                />
+                              )}
+                            </Carousel.Item>
+                          );
+                        })}
+                      </Carousel>
                     </div>
                   </Col>
                 </Row>
@@ -193,7 +212,6 @@ const SingleOrder = () => {
                   variant="warning"
                   onClick={toggleOrderStatus}
                   className="btn-lg"
-
                 >
                   {order.status === "Completed"
                     ? "Mark as In Progress"
@@ -212,17 +230,30 @@ const SingleOrder = () => {
         </Col>
       </Row>
 
-      {/* Full-Screen Image Modal */}
+      {/* Full-Screen Media Modal */}
       <Modal isOpen={modalOpen} toggle={closeModal} size="lg">
         <ModalHeader toggle={closeModal}></ModalHeader>
         <ModalBody>
           <div className="text-center">
-            <img
-              src={imageUrl}
-              alt="Style Inspiration"
-              className="img-fluid rounded"
-              style={{ maxHeight: "80vh", objectFit: "contain" }}
-            />
+            {mediaUrl.endsWith(".mp4") ||
+            mediaUrl.endsWith(".mov") ||
+            mediaUrl.endsWith(".avi") ? (
+              <video
+                controls
+                className="img-fluid rounded"
+                style={{ maxHeight: "80vh", objectFit: "contain" }}
+              >
+                <source src={mediaUrl} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            ) : (
+              <img
+                src={mediaUrl}
+                alt="Style Inspiration"
+                className="img-fluid rounded"
+                style={{ maxHeight: "80vh", objectFit: "contain" }}
+              />
+            )}
           </div>
         </ModalBody>
       </Modal>
