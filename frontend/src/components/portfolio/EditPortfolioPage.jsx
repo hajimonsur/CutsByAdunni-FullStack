@@ -81,6 +81,13 @@ const EditPortfolioPage = () => {
     }
   };
 
+  const handleRemoveImage = (imageUrl) => {
+    setPortfolio((prevPortfolio) => ({
+      ...prevPortfolio,
+      images: prevPortfolio.images.filter((image) => image !== imageUrl),
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -89,6 +96,7 @@ const EditPortfolioPage = () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
         body: JSON.stringify(portfolio),
       });
@@ -96,7 +104,7 @@ const EditPortfolioPage = () => {
       if (!response.ok) throw new Error("Failed to update portfolio item");
 
       setMessage("Portfolio item updated successfully");
-      navigate(`/portfolio/${id}`);
+      navigate(`/portfolio`);
     } catch (error) {
       console.error(error.message);
       setMessage("Error updating portfolio item");
@@ -158,27 +166,49 @@ const EditPortfolioPage = () => {
           <div className="mt-2">
             {portfolio.images.map((image, index) =>
               image.endsWith(".mp4") ? (
-                <video
+                <div
                   key={index}
-                  src={image}
-                  controls
-                  style={{
-                    width: "100px",
-                    height: "100px",
-                    marginRight: "10px",
-                  }}
-                />
+                  style={{ display: "inline-block", marginRight: "10px" }}
+                >
+                  <video
+                    src={image}
+                    controls
+                    style={{
+                      width: "100px",
+                      height: "100px",
+                    }}
+                  />
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => handleRemoveImage(image)}
+                  >
+                    Remove
+                  </Button>
+                </div>
               ) : (
-                <img
+                <div
                   key={index}
-                  src={image}
-                  alt={`Portfolio ${index}`}
-                  style={{
-                    width: "100px",
-                    height: "100px",
-                    marginRight: "10px",
-                  }}
-                />
+                  style={{ display: "inline-block", marginRight: "10px" }}
+                >
+                  <img
+                    src={image}
+                    alt={`Portfolio ${index}`}
+                    style={{
+                      width: "100px",
+                      height: "100px",
+                    }}
+                  />
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => handleRemoveImage(image)}
+                  >
+                    Remove
+                  </Button>
+                </div>
               )
             )}
           </div>

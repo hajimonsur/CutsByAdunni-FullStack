@@ -1,193 +1,232 @@
-import React, { useState } from "react";
-import { Button, Form } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
+"use client";
 
-const UpdatePortfolio = () => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
-  const [error, setError] = useState(null);
-  const [media, setMedia] = useState([]); // Store media URLs
+import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Form, Button, Container, Alert } from "react-bootstrap";
 
+const EditPortfolioPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const [portfolio, setPortfolio] = useState({
+    title: "",
+    description: "",
+    images: [],
+    category: "",
+  });
+
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+
+  const apiUrl = import.meta.env.VITE_API_URL;
   const cloudName = import.meta.env.VITE_REACT_APP_CLOUDINARY_CLOUD_NAME;
   const uploadPreset = import.meta.env.VITE_REACT_APP_CLOUDINARY_UPLOAD_PRESET;
-  const apiUrl = import.meta.env.VITE_API_URL;
 
-  // Handle file input change to upload media
-  const handleFileChange = async (e) => {
-    const files = e.target.files;
-  
-    if (files.length > 0) {
+  useEffect(() => {
+    const fetchPortfolio = async () => {
       try {
-        // For each file, upload to Cloudinary and update the media state immediately
-        for (let file of files) {
-          const formData = new FormData();
-          formData.append("file", file);
-          formData.append("upload_preset", `${uploadPreset}`);
-  
-          const resourceType = file.type.startsWith("video")
-            ? "video"
-            : "image";
-  
-          const response = await fetch(
-            `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
-            {
-              method: "POST",
-              body: formData,
-            }
-          );
-  
-          if (response.ok) {
-            const data = await response.json();
-            console.log(`Uploaded ${file.name}: ${data.secure_url}`); // Debugging the URL
-  
-            // Immediately update the media state with the new URL
-            setMedia((prevMedia) => [...prevMedia, data.secure_url]);
-          } else {
-            console.error("Failed to upload file:", file.name);
-          }
-        }
+        const response = await fetch(`${apiUrl}/api/portfolio/${id}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
+        if (!response.ok) throw new Error("Failed to fetch portfolio item");
+        const data = await response.json();
+        setPortfolio(data);
+        setLoading(false);
       } catch (error) {
-        console.error("Error uploading files to Cloudinary:", error);
+        console.error(error.message);
+        setMessage("Error loading portfolio item");
+        setLoading(false);
       }
+    };
+
+    fetchPortfolio();
+  }, [id]);
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("upload_preset", uploadPreset);
+    formData.append("file", file);
+
+    const resourceType = file.type.startsWith("video") ? "video" : "image";
+
+    try {
+      setUploading(true);
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) throw new Error("File upload failed");
+
+      const data = await response.json();
+      setPortfolio((prevPortfolio) => ({
+        ...prevPortfolio,
+        images: [...prevPortfolio.images, data.secure_url],
+      }));
+      setUploading(false);
+    } catch (error) {
+      console.error("Upload error:", error);
+      setMessage("Error uploading file");
+      setUploading(false);
     }
   };
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`${apiUrl}/api/portfolio`, {
-        method: "POST",
+      const response = await fetch(`${apiUrl}/api/portfolio/${id}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
-        body: JSON.stringify({
-          title,
-          description,
-          category,
-          images: media,
-        }),
+        body: JSON.stringify(portfolio),
       });
 
-      const data = await response.json();
+      if (!response.ok) throw new Error("Failed to update portfolio item");
 
-      if (response.ok) {
-        alert("Portfolio updated successfully!");
-      } else {
-        setError(
-          data.message || "An error occurred while updating the portfolio."
-        );
-      }
+      setMessage("Portfolio item updated successfully");
+      navigate(`/portfolio`);
     } catch (error) {
       console.error(error.message);
-      setError("An error occurred while submitting the portfolio.");
+      setMessage("Error updating portfolio item");
     }
-
-    setTitle("");
-    setDescription("");
-    setCategory("");
-    setMedia([]);
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setPortfolio((prevPortfolio) => ({
+      ...prevPortfolio,
+      [name]: value,
+    }));
+  };
+
+  const handleRemoveImage = (imageToRemove) => {
+    setPortfolio((prevPortfolio) => ({
+      ...prevPortfolio,
+      images: prevPortfolio.images.filter((image) => image !== imageToRemove),
+    }));
+  };
+
+  if (loading) return <div>Loading...</div>;
+
   return (
-    <div className="container my-5">
-      <div className="row justify-content-center">
-        <div className="col-md-8">
-          <h1 className="text-center mb-4">Update Portfolio</h1>
+    <Container>
+      <h1>Edit Portfolio Item</h1>
 
-          <Form className="shadow p-4 rounded bg-light" onSubmit={handleSubmit}>
-            <Form.Group className="mb-3" controlId="title">
-              <Form.Label>Title</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter Title"
-                className="shadow-sm"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-            </Form.Group>
+      {message && (
+        <Alert variant={message.includes("Error") ? "danger" : "success"}>
+          {message}
+        </Alert>
+      )}
 
-            <Form.Group className="mb-3" controlId="textarea">
-              <Form.Label>Description</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={5}
-                placeholder="Write your description here..."
-                className="shadow-sm"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-            </Form.Group>
+      <Form onSubmit={handleSubmit}>
+        <Form.Group controlId="title">
+          <Form.Label>Title</Form.Label>
+          <Form.Control
+            type="text"
+            name="title"
+            value={portfolio.title}
+            onChange={handleInputChange}
+            required
+          />
+        </Form.Group>
 
-            {/* Media Upload */}
-            <Form.Group className="mb-3">
-              <Form.Label>Upload Media (Images & Videos)</Form.Label>
-              <Form.Control type="file" multiple onChange={handleFileChange} />
-            </Form.Group>
+        <Form.Group controlId="description" className="mt-3">
+          <Form.Label>Description</Form.Label>
+          <Form.Control
+            as="textarea"
+            name="description"
+            rows={4}
+            value={portfolio.description}
+            onChange={handleInputChange}
+            required
+          />
+        </Form.Group>
 
-            {/* Display Uploaded Media */}
-            <div className="mb-3">
-              <h5>Uploaded Media:</h5>
-              <div className="d-flex flex-wrap">
-                {media.map((url, index) => (
-                  <div key={index} className="me-3 mb-3">
-                    {url.endsWith(".mp4") || url.endsWith(".mov") ? (
-                      <video width="150" height="150" controls>
-                        <source src={url} type="video/mp4" />
-                        Your browser does not support the video tag.
-                      </video>
-                    ) : (
-                      <img
-                        src={url}
-                        alt={`uploaded-media-${index}`}
-                        width="150"
-                        height="150"
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
+        <Form.Group controlId="images" className="mt-3">
+          <Form.Label>Upload Images or Videos</Form.Label>
+          <Form.Control
+            type="file"
+            accept="image/*,video/*"
+            onChange={handleFileUpload}
+          />
+          {uploading && <p>Uploading...</p>}
+          <div className="mt-2">
+            {portfolio.images.map((image, index) => {
+              const isVideo = image.endsWith(".mp4");
+              return (
+                <div
+                  key={index}
+                  style={{ display: "inline-block", marginRight: "10px" }}
+                >
+                  {isVideo ? (
+                    <video
+                      src={image}
+                      controls
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                      }}
+                    />
+                  ) : (
+                    <img
+                      src={image}
+                      alt={`Portfolio ${index}`}
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                      }}
+                    />
+                  )}
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => handleRemoveImage(image)}
+                  >
+                    X
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
+        </Form.Group>
 
-            {/* Category Selection */}
-            <Form.Group className="mb-3">
-              <Form.Label>Category</Form.Label>
-              <Form.Select
-                aria-label="Select category"
-                className="shadow-sm"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-              >
-                <option>Select Category</option>
-                <option value="casual">Casual</option>
-                <option value="traditional">Traditional</option>
-                <option value="bridal">Bridal</option>
-                <option value="formal">Formal</option>
-                <option value="others">Other</option>
-              </Form.Select>
-            </Form.Group>
+        <Form.Group controlId="category" className="mt-3">
+          <Form.Label>Category</Form.Label>
+          <Form.Control
+            as="select"
+            name="category"
+            value={portfolio.category}
+            onChange={handleInputChange}
+          >
+            <option>Select Category</option>
+            <option value="casual">Casual</option>
+            <option value="traditional">Traditional</option>
+            <option value="bridal">Bridal</option>
+            <option value="formal">Formal</option>
+            <option value="others">Other</option>
+          </Form.Control>
+        </Form.Group>
 
-            {/* Submit Button */}
-            <div className="d-grid">
-              <Button
-                variant="warning"
-                type="submit"
-                className="shadow-sm py-2"
-              >
-                Submit
-              </Button>
-            </div>
-          </Form>
-
-          {/* Error Message */}
-          {error && <div className="alert alert-danger mt-3">{error}</div>}
-        </div>
-      </div>
-    </div>
+        <Button variant="warning" type="submit" className="mt-4 mb-4">
+          Update Portfolio
+        </Button>
+      </Form>
+    </Container>
   );
 };
 
-export default UpdatePortfolio;
+export default EditPortfolioPage;

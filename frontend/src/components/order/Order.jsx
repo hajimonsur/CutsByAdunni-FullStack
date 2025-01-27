@@ -55,6 +55,34 @@ const OrderPage = () => {
       borderRadius: "8px",
       boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
     },
+    filePreview: {
+      position: "relative",
+      marginRight: "10px",
+      marginBottom: "10px",
+    },
+    removeButton: {
+      position: "absolute",
+      top: "5px",
+      right: "5px",
+      background: "rgba(255, 0, 0, 0.7)",
+      color: "#fff",
+      border: "none",
+      borderRadius: "50%",
+      cursor: "pointer",
+      padding: "5px",
+    },
+    galleryImage: {
+      maxWidth: "120px",
+      maxHeight: "120px",
+      objectFit: "cover",
+      borderRadius: "8px",
+    },
+    videoPlayer: {
+      maxWidth: "120px",
+      maxHeight: "120px",
+      objectFit: "cover",
+      borderRadius: "8px",
+    },
   };
 
   const [name, setName] = useState("");
@@ -156,6 +184,10 @@ const OrderPage = () => {
     }
   };
 
+  const handleRemoveFile = (index) => {
+    setStyleInspo((prev) => prev.filter((_, i) => i !== index));
+  };
+
   return (
     <div>
       <section style={styles.hero}>
@@ -255,23 +287,31 @@ const OrderPage = () => {
               <div className="mt-2">
                 <strong>Uploaded Files:</strong>
                 <div className="d-flex flex-wrap">
-                  {styleInspo.map((url, index) =>
-                    url.includes("video") ? (
-                      <video
-                        key={index}
-                        src={url}
-                        controls
-                        style={styles.videoPlayer}
-                      />
-                    ) : (
-                      <img
-                        key={index}
-                        src={url}
-                        alt={`Uploaded style ${index + 1}`}
-                        style={styles.galleryImage}
-                      />
-                    )
-                  )}
+                  {styleInspo.map((url, index) => (
+                    <div key={index} style={styles.filePreview}>
+                      {url.includes("video") ? (
+                        <video
+                          key={index}
+                          src={url}
+                          controls
+                          style={styles.videoPlayer}
+                        />
+                      ) : (
+                        <img
+                          key={index}
+                          src={url}
+                          alt={`Uploaded style ${index + 1}`}
+                          style={styles.galleryImage}
+                        />
+                      )}
+                      <button
+                        style={styles.removeButton}
+                        onClick={() => handleRemoveFile(index)}
+                      >
+                        X
+                      </button>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
