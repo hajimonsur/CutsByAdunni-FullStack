@@ -16,7 +16,7 @@ import {
   FaClock,
 } from "react-icons/fa";
 
-import "./home.css";
+import "./Home.css";
 import UploadTestimony from "../testimony/UploadTestimony";
 
 const HomePage = () => {
