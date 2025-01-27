@@ -10,17 +10,12 @@ import {
   Badge,
   Spinner,
 } from "reactstrap";
-import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { FaCheckCircle, FaTimesCircle, FaBars } from "react-icons/fa";
 import AdminSidebar from "./AdminSidebar";
 import "./AdminDashboard.css";
 import { useNavigate } from "react-router-dom";
 
-const OrderCard = ({ order, handleViewOrderDetails }) => {
-  const formattedDate =
-    order.date && order.time
-      ? new Date(`${order.date}T${order.time}`).toLocaleString()
-      : "Unknown Date";
-
+const OrderCard = ({ order, handleViewOrderDetails, formatDate }) => {
   return (
     <Card className="order-card shadow-sm">
       <CardBody>
@@ -43,7 +38,7 @@ const OrderCard = ({ order, handleViewOrderDetails }) => {
           </Badge>
         </p>
         <p>
-          <strong>Order Date:</strong> {formattedDate}
+          <strong>Order Date:</strong> {formatDate(order.date) || "N/A"}
         </p>
         <Button
           color="warning"
@@ -62,6 +57,7 @@ const AdminDashboard = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
 
   const apiUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
@@ -70,22 +66,37 @@ const AdminDashboard = () => {
     navigate(`/order/${orderId}`);
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const handleResize = () => {
+    if (window.innerWidth <= 768) {
+      setIsSidebarOpen(false);
+    } else {
+      setIsSidebarOpen(true);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+  };
+
   useEffect(() => {
     const adminDetails = JSON.parse(localStorage.getItem("user"));
     if (adminDetails) {
       setAdmin(adminDetails);
     }
     fetchDashboardData();
+
+    // Add resize event listener
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
-
-  const fixDateFormat = (dateString) => {
-    // Regular expression to remove unwanted characters from date string (like "ZT18:32:31")
-    const correctedDateString = dateString.replace(/Z.*$/, ""); // Keep only valid date part
-
-    // Try to create a valid Date object
-    const date = new Date(correctedDateString);
-    return date instanceof Date && !isNaN(date) ? date : null; // Return valid date or null if invalid
-  };
 
   const fetchDashboardData = async () => {
     try {
@@ -103,20 +114,14 @@ const AdminDashboard = () => {
       }
 
       const data = await response.json();
-      console.log("Fetched Orders:", data);
 
-      // Sort orders by most recent date/time
+      // Sort and limit orders to 5 most recent
       const sortedOrders = data
-        .map((order) => {
-          const formattedDate = `${order.date}T${order.time}`; // Combine date and time
-          const validDateTime = fixDateFormat(formattedDate); // Fix and validate the date
-          return { ...order, validDateTime }; // Add validDateTime to each order
-        })
-        .filter((order) => order.validDateTime !== null) // Filter out invalid dates
-        .sort((a, b) => b.validDateTime - a.validDateTime) // Sort by most recent
-        .slice(0, 5); // Get the latest 5 orders
+        .filter((order) => order.date) // Ensure orders have valid dates
+        .sort((a, b) => new Date(b.date) - new Date(a.date)) // Sort by date descending
+        .slice(0, 5); // Get top 5
 
-      setOrders(sortedOrders); // Update the state with sorted orders
+      setOrders(sortedOrders);
     } catch (err) {
       setError(
         err.message || "Failed to fetch orders. Please try again later."
@@ -147,11 +152,29 @@ const AdminDashboard = () => {
 
   return (
     <Container fluid>
-      <Row>
-        <Col md={3} className="sidebar-col">
-          <AdminSidebar />
+      <Row className="navbar-row">
+        <Col>
+          <h2 className="navbar-title">Admin Dashboard</h2>
+          <Button
+            className="toggle-sidebar-btn d-md-none"
+            onClick={toggleSidebar}
+          >
+            <FaBars />
+          </Button>
         </Col>
-        <Col md={9} className="dashboard-col">
+      </Row>
+      <Row>
+        {isSidebarOpen && (
+          <Col
+            md={3}
+            className={`sidebar-col ${
+              isSidebarOpen ? "sidebar-open" : "sidebar-closed"
+            }`}
+          >
+            <AdminSidebar />
+          </Col>
+        )}
+        <Col md={isSidebarOpen ? 9 : 12} className="dashboard-col">
           <Card className="welcome-card mb-4">
             <CardBody>
               <h3>Welcome, {admin.username}</h3>
@@ -178,6 +201,7 @@ const AdminDashboard = () => {
                           <OrderCard
                             order={order}
                             handleViewOrderDetails={handleViewOrderDetails}
+                            formatDate={formatDate}
                           />
                         </Col>
                       ))

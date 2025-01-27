@@ -22,10 +22,13 @@ import UploadTestimony from "./components/testimony/UploadTestimony";
 import AdminTestimony from "./components/testimony/AdminTestimony";
 import ProjectDetailPage from "./components/portfolio/ProjectDetailPage";
 import ResetPassword from "./components/authentication/ResetPassword";
+import EditPortfolioPage from "./components/portfolio/EditPortfolioPage";
+
 
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
   const navigate = useNavigate();
+
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -61,6 +64,7 @@ const App = () => {
       ) : (
         <div>
           <NavComp />
+  
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/order" element={<OrderPage />} />
@@ -78,6 +82,7 @@ const App = () => {
             <Route path="/admintestimony/" element={<AdminTestimony />} />
             <Route path="/project/:id" element={<ProjectDetailPage />} />
             <Route path="/resetpassword" element={<ResetPassword />} />
+            <Route path="/editPortfolio/:id" element={<EditPortfolioPage/>} />
 
             {/* ProtectedRoute for the /admin path */}
             <Route

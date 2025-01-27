@@ -1,6 +1,14 @@
 import React, { useState } from "react";
-import { Form, Button } from "react-bootstrap";
-import { FaRuler, FaPalette, FaTruck } from "react-icons/fa";
+import {
+  Form,
+  Button,
+  Row,
+  Col,
+  Card,
+  Alert,
+  Accordion,
+} from "react-bootstrap";
+import { FaRuler, FaPalette, FaUpload, FaSmile } from "react-icons/fa";
 
 const OrderPage = () => {
   const styles = {
@@ -10,42 +18,42 @@ const OrderPage = () => {
       backgroundColor: "#f1f1f1",
       borderRadius: "8px",
       boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+      marginBottom: "30px",
     },
-    section: {
-      padding: "40px 20px",
+    stepContainer: {
+      padding: "30px 20px",
+      display: "flex",
+      justifyContent: "space-around",
+      flexWrap: "wrap",
+      gap: "20px",
+    },
+    stepCard: {
+      textAlign: "center",
+      padding: "20px",
       borderRadius: "10px",
       boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-      margin: "2rem auto",
-      maxWidth: "1200px",
-    },
-    formContainer: {
-      maxWidth: "600px",
-      margin: "0 auto",
+      width: "250px",
     },
     icon: {
-      fontSize: "60px",
+      fontSize: "50px",
       color: "#FFC107",
       marginBottom: "15px",
     },
-    stepContainer: {
-      display: "flex",
-      justifyContent: "center",
-      flexWrap: "wrap",
-      marginTop: "30px",
-      gap: "2rem",
-    },
-    galleryImage: {
-      width: "100px",
-      height: "100px",
-      objectFit: "cover",
-      margin: "5px",
+    formContainer: {
+      padding: "40px 20px",
+      backgroundColor: "#fff",
       borderRadius: "8px",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+      maxWidth: "800px",
+      margin: "0 auto",
     },
-    videoPlayer: {
-      width: "100px",
-      height: "auto",
-      margin: "5px",
+    accordionSection: {
+      padding: "40px 20px",
+      maxWidth: "800px",
+      margin: "0 auto",
+      backgroundColor: "#f8f9fa",
       borderRadius: "8px",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
     },
   };
 
@@ -55,11 +63,11 @@ const OrderPage = () => {
   const [measurements, setMeasurements] = useState("");
   const [additionalNotes, setAdditionalNotes] = useState("");
   const [styleInspo, setStyleInspo] = useState([]);
+  const [alertMessage, setAlertMessage] = useState(null);
 
   const cloudName = import.meta.env.VITE_REACT_APP_CLOUDINARY_CLOUD_NAME;
   const apiUrl = import.meta.env.VITE_API_URL;
   const uploadPreset = import.meta.env.VITE_REACT_APP_CLOUDINARY_UPLOAD_PRESET;
-
 
   const handleClear = () => {
     setName("");
@@ -90,14 +98,23 @@ const OrderPage = () => {
       });
 
       if (response.ok) {
-        alert("Order submitted successfully!");
+        setAlertMessage({
+          type: "success",
+          text: "Order submitted successfully!",
+        });
         handleClear();
       } else {
-        alert("Failed to submit order. Please try again.");
+        setAlertMessage({
+          type: "danger",
+          text: "Failed to submit order. Please try again.",
+        });
       }
     } catch (error) {
       console.error("Error submitting order:", error);
-      alert("Failed to submit order. Please try again.");
+      setAlertMessage({
+        type: "danger",
+        text: "Failed to submit order. Please try again.",
+      });
     }
   };
 
@@ -142,114 +159,177 @@ const OrderPage = () => {
   return (
     <div>
       <section style={styles.hero}>
-        <h1>Place Your Custom Order</h1>
-        <p>
-          Experience the finest tailoring with CutByAdunni. Your perfect fit,
-          designed just for you.
-        </p>
+        <h1>Welcome to CutByAdunni</h1>
+        <p>Your personal tailoring experience made easy and stylish.</p>
         <Button variant="warning" size="lg" href="#customize-order-section">
-          Place Your Order
+          Start Your Order
         </Button>
       </section>
 
-      <section id="customize-order-section" style={styles.section}>
-        <h2 className="text-center">Customize Your Order</h2>
-        <div style={styles.formContainer}>
-          <Form onSubmit={handleSubmit}>
-            <Form.Group controlId="name">
-              <Form.Label>Name</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </Form.Group>
-
-            <Form.Group controlId="email">
-              <Form.Label>Email Address</Form.Label>
-              <Form.Control
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </Form.Group>
-
-            <Form.Group controlId="fabricDetail">
-              <Form.Label>Fabric Details</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Describe your preferred fabric"
-                value={fabricDetails}
-                onChange={(e) => setFabricDetails(e.target.value)}
-              />
-            </Form.Group>
-
-            <Form.Group controlId="measurements">
-              <Form.Label>Measurements</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Input your measurements"
-                value={measurements}
-                onChange={(e) => setMeasurements(e.target.value)}
-              />
-            </Form.Group>
-
-            <div className="mb-3">
-              <label htmlFor="upload" className="form-label d-block mb-2">
-                <b>Upload Style Inspo</b>
-              </label>
-              <input
-                type="file"
-                id="upload"
-                multiple
-                accept="image/*, video/*"
-                onChange={handleFileChange}
-              />
-              {styleInspo.length > 0 && (
-                <div className="mt-2">
-                  <strong>Uploaded Files:</strong>
-                  <div className="d-flex flex-wrap">
-                    {styleInspo.map((url, index) => {
-                      const isVideo = url.includes("video");
-                      return isVideo ? (
-                        <video
-                          key={index}
-                          src={url}
-                          controls
-                          style={styles.videoPlayer}
-                        />
-                      ) : (
-                        <img
-                          key={index}
-                          src={url}
-                          alt={`Uploaded style ${index + 1}`}
-                          style={styles.galleryImage}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <Form.Group controlId="notes">
-              <Form.Label>Additional Notes</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                placeholder="Add any specific requests or details"
-                value={additionalNotes}
-                onChange={(e) => setAdditionalNotes(e.target.value)}
-              />
-            </Form.Group>
-
-            <Button variant="warning" type="submit" className="mt-3">
-              Submit Order
-            </Button>
-          </Form>
+      <section>
+        <h2 className="text-center">How It Works</h2>
+        <div style={styles.stepContainer}>
+          <div style={styles.stepCard}>
+            <FaPalette style={styles.icon} />
+            <h5>Choose Your Fabric</h5>
+            <p>
+              Select from a variety of premium fabrics for your custom look.
+            </p>
+          </div>
+          <div style={styles.stepCard}>
+            <FaRuler style={styles.icon} />
+            <h5>Provide Measurements</h5>
+            <p>Ensure the perfect fit by sharing your exact measurements.</p>
+          </div>
+          <div style={styles.stepCard}>
+            <FaUpload style={styles.icon} />
+            <h5>Upload Style Inspiration</h5>
+            <p>Share images or videos of your desired style.</p>
+          </div>
         </div>
+      </section>
+
+      <section id="customize-order-section" style={styles.formContainer}>
+        <h3 className="text-center mb-4">Customize Your Order</h3>
+        {alertMessage && (
+          <Alert variant={alertMessage.type}>{alertMessage.text}</Alert>
+        )}
+        <Form onSubmit={handleSubmit}>
+          <Row>
+            <Col md={6}>
+              <Form.Group controlId="name" className="mb-3">
+                <Form.Label>Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter your name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group controlId="email" className="mb-3">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Form.Group controlId="fabricDetail" className="mb-3">
+            <Form.Label>Fabric Details</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Describe your preferred fabric"
+              value={fabricDetails}
+              onChange={(e) => setFabricDetails(e.target.value)}
+            />
+          </Form.Group>
+
+          <Form.Group controlId="measurements" className="mb-3">
+            <Form.Label>Measurements</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Provide your measurements"
+              value={measurements}
+              onChange={(e) => setMeasurements(e.target.value)}
+            />
+          </Form.Group>
+
+          <div className="mb-3">
+            <label htmlFor="upload" className="form-label">
+              Upload Style Inspiration
+            </label>
+            <input
+              type="file"
+              id="upload"
+              multiple
+              accept="image/*, video/*"
+              onChange={handleFileChange}
+            />
+            {styleInspo.length > 0 && (
+              <div className="mt-2">
+                <strong>Uploaded Files:</strong>
+                <div className="d-flex flex-wrap">
+                  {styleInspo.map((url, index) =>
+                    url.includes("video") ? (
+                      <video
+                        key={index}
+                        src={url}
+                        controls
+                        style={styles.videoPlayer}
+                      />
+                    ) : (
+                      <img
+                        key={index}
+                        src={url}
+                        alt={`Uploaded style ${index + 1}`}
+                        style={styles.galleryImage}
+                      />
+                    )
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <Form.Group controlId="notes" className="mb-3">
+            <Form.Label>Additional Notes</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              placeholder="Add specific requests or details"
+              value={additionalNotes}
+              onChange={(e) => setAdditionalNotes(e.target.value)}
+            />
+          </Form.Group>
+
+          <Button variant="warning" type="submit">
+            Submit Order
+          </Button>
+        </Form>
+      </section>
+
+      <section style={styles.accordionSection}>
+        <h3 className="text-center mb-4">Frequently Asked Questions</h3>
+        <Accordion>
+          <Accordion.Item eventKey="0">
+            <Accordion.Header>
+              What is the turnaround time for an order?
+            </Accordion.Header>
+            <Accordion.Body>
+              Our typical turnaround time for custom orders is 7-10 business
+              days, depending on the complexity of your request.
+            </Accordion.Body>
+          </Accordion.Item>
+          <Accordion.Item eventKey="1">
+            <Accordion.Header>Can I provide my own fabric?</Accordion.Header>
+            <Accordion.Body>
+              Yes, you can provide your own fabric. Please mention it in the
+              "Fabric Details" section of the order form.
+            </Accordion.Body>
+          </Accordion.Item>
+          <Accordion.Item eventKey="2">
+            <Accordion.Header>How do I share my measurements?</Accordion.Header>
+            <Accordion.Body>
+              You can share your measurements in the provided field or upload a
+              measurement chart as part of your style inspiration.
+            </Accordion.Body>
+          </Accordion.Item>
+          <Accordion.Item eventKey="3">
+            <Accordion.Header>
+              Can I request adjustments after delivery?
+            </Accordion.Header>
+            <Accordion.Body>
+              Absolutely! We offer free adjustments within 14 days of delivery
+              for any fitting issues.
+            </Accordion.Body>
+          </Accordion.Item>
+        </Accordion>
       </section>
     </div>
   );

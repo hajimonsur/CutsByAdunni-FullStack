@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
   Container,
@@ -8,14 +8,22 @@ import {
   Button,
   Modal,
   Carousel,
-} from "react-bootstrap"; // Import Bootstrap components
+  Alert,
+} from "react-bootstrap"; 
+import { FaEdit, FaTrashAlt } from "react-icons/fa"; 
+import "./ProjectDetailPage.css"; 
 
 const ProjectDetailPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [project, setProject] = useState(null);
   const [modalOpen, setModalOpen] = useState(false); // State for modal
   const [currentIndex, setCurrentIndex] = useState(0); // State for carousel index
+  const [showAlert, setShowAlert] = useState(false); // Alert for delete success
   const apiUrl = import.meta.env.VITE_API_URL;
+
+  // Check if user is admin from localStorage
+  const isAdmin = localStorage.getItem("role") === "admin";
 
   useEffect(() => {
     const fetchProjectDetail = async () => {
@@ -51,11 +59,37 @@ const ProjectDetailPage = () => {
     setCurrentIndex(selectedIndex);
   };
 
+  // Handle delete project
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/portfolio/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to delete project");
+
+      setShowAlert(true);
+      setTimeout(() => {
+        setShowAlert(false);
+        navigate("/portfolio"); // Redirect to portfolio list after delete
+      }, 2000);
+    } catch (error) {
+      console.error("Delete Error: ", error);
+    }
+  };
+
+  // Navigate to Edit Portfolio page
+  const handleEdit = () => {
+    navigate(`/editPortfolio/${id}`);
+  };
+
   if (!project) return <div>Loading...</div>;
 
   return (
     <Container fluid="md" style={{ paddingTop: "50px", paddingBottom: "50px" }}>
-      {/* Project Title */}
+     
       <Row className="mb-4">
         <Col>
           <h1 className="text-center">{project.title}</h1>
@@ -128,6 +162,27 @@ const ProjectDetailPage = () => {
               <Card.Text>{project.description}</Card.Text>
             </Card.Body>
           </Card>
+
+          {/* Admin buttons for update and delete */}
+          {isAdmin && (
+            <div className="admin-actions mt-3">
+              <Button
+                variant="warning"
+                className="me-3"
+                onClick={handleEdit}
+                style={{ width: "48%" }}
+              >
+                <FaEdit /> Edit Portfolio
+              </Button>
+              <Button
+                variant="danger"
+                onClick={handleDelete}
+                style={{ width: "48%" }}
+              >
+                <FaTrashAlt /> Delete Portfolio
+              </Button>
+            </div>
+          )}
         </Col>
       </Row>
 
@@ -198,6 +253,17 @@ const ProjectDetailPage = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Success Alert */}
+      {showAlert && (
+        <Alert
+          variant="success"
+          onClose={() => setShowAlert(false)}
+          dismissible
+        >
+          Project successfully deleted!
+        </Alert>
+      )}
     </Container>
   );
 };

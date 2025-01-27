@@ -1,76 +1,54 @@
-/* Add custom styles to enhance the layout */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.navbar-row {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.navbar-title {
+  margin: 0;
+  font-size: 1.5rem;
+  display: inline-block;
+}
+
+.toggle-sidebar-btn {
+  float: right;
+  font-size: 1.5rem;
+  color: #333;
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
 .sidebar-col {
-    background-color: #f8f9fa;
-    padding: 20px;
-    border-right: 1px solid #ddd;
+  background-color: #f8f9fa;
+  transition: all 0.3s ease;
+  height: 100vh;
+}
+
+.sidebar-open {
+  display: block;
+}
+
+.sidebar-closed {
+  display: none;
+}
+
+.dashboard-col {
+  transition: margin-left 0.3s ease;
+}
+
+@media (min-width: 768px) {
+  .toggle-sidebar-btn {
+    display: none;
   }
 
   .sidebar-col {
-    background-color: #f8f9fa;
-    min-height: 100vh;
-    padding-top: 20px;
+    display: block;
   }
-  
-  .dashboard-col {
-    padding: 20px;
-  }
-  
-  .order-card {
-    border-radius: 8px;
-    transition: transform 0.3s ease;
-  }
-  
-  .order-card:hover {
-    transform: scale(1.05);
-  }
-  
-  .welcome-card {
-    background-color: #e9ecef;
-  }
-  
-  
-  .dashboard-col {
-    padding: 20px;
-  }
-  
-  .welcome-card {
-    background-color: #f7f7f7;
-    border-radius: 8px;
-  }
-  
-  .order-card {
-    border-radius: 8px;
-  }
-  
-  .order-col {
-    padding: 0 10px;
-  }
-  
-  .card-header {
-    font-size: 1.25rem;
-    font-weight: bold;
-  }
-  
-  .card-body {
-    background-color: #fff;
-  }
-  
-  .order-card .btn {
-    width: 100%;
-  }
-  
-  /* Enhance the button with hover effects */
-  .order-card .btn:hover {
-    background-color: #e6a600;
-  }
-  
-  @media (max-width: 768px) {
-    .sidebar-col {
-      width: 100%;
-    }
-  
-    .dashboard-col {
-      width: 100%;
-    }
-  }
-  
+}

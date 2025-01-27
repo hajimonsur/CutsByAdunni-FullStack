@@ -146,7 +146,7 @@ const ContactPage = () => {
               <h4>Follow Us</h4>
               <div>
                 <a
-                  href="https://www.facebook.com"
+                  href="#"
                   className="btn btn-outline-warning mx-2"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -162,7 +162,7 @@ const ContactPage = () => {
                   Instagram
                 </a>
                 <a
-                  href="https://twitter.com"
+                  href="#"
                   className="btn btn-outline-warning mx-2"
                   target="_blank"
                   rel="noopener noreferrer"

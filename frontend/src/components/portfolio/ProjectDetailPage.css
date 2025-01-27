@@ -1,0 +1,129 @@
+/* Ensure that the container and row have proper margins and padding */
+.container-fluid {
+    padding: 0 15px;
+  }
+  
+  .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  
+  /* Styling for the project title */
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  /* Side-by-side layout with image and description */
+  .mb-4 {
+    margin-bottom: 30px;
+  }
+  
+  .card {
+    background-color: #f8f9fa;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  
+  .card-body {
+    font-size: 1rem;
+    color: #555;
+  }
+  
+  .card img,
+  .card video {
+    border-radius: 10px;
+    width: 100%;
+    object-fit: cover;
+  }
+  
+  .card-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #444;
+  }
+  
+  /* Carousel Styling */
+  .carousel-item img,
+  .carousel-item video {
+    border-radius: 10px;
+    max-height: 70vh;
+    object-fit: contain;
+  }
+  
+  .carousel-item {
+    margin-bottom: 20px;
+  }
+  
+  /* Modal Styling */
+  .modal-body {
+    padding: 0;
+  }
+  
+  .modal-footer {
+    border-top: none;
+  }
+  
+  /* Styling for the buttons (Update, Delete) */
+  button {
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 5px;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  /* Ensure responsiveness on smaller screens */
+  @media (max-width: 768px) {
+    .mb-4 {
+      margin-bottom: 20px;
+    }
+  
+    .card {
+      margin-bottom: 15px;
+    }
+  
+    h1 {
+      font-size: 2rem;
+    }
+  
+    .carousel-item img,
+    .carousel-item video {
+      max-height: 50vh;
+    }
+  
+    .card-body {
+      padding: 15px;
+    }
+  
+    .container-fluid {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+  }
+  
+  /* Extra small screen styling */
+  @media (max-width: 480px) {
+    h1 {
+      font-size: 1.8rem;
+    }
+  
+    .carousel-item img,
+    .carousel-item video {
+      max-height: 40vh;
+    }
+  
+    .card-body {
+      padding: 10px;
+    }
+  }
+  
