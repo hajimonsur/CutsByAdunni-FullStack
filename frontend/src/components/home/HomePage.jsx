@@ -242,7 +242,7 @@ const HomePage = () => {
                 }
               />
             </Form.Group>
-            <Button type="submit" variant="primary" className="mt-4 w-100">
+            <Button type="submit" variant="warning" className="mt-4 w-100">
               Submit
             </Button>
           </Form>

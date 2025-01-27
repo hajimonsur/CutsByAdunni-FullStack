@@ -1,42 +1,44 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { Form, Button, Container, Alert } from 'react-bootstrap';
+"use client";
+
+import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Form, Button, Container, Alert } from "react-bootstrap";
 
 const EditPortfolioPage = () => {
-  const { id } = useParams(); // Get the portfolio item id from the URL params
-  const navigate = useNavigate(); 
+  const { id } = useParams();
+  const navigate = useNavigate();
 
   const [portfolio, setPortfolio] = useState({
-    title: '',
-    description: '',
+    title: "",
+    description: "",
     images: [],
-    category: '',
-
+    category: "",
   });
-  const [message, setMessage] = useState('');
+
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
 
   const apiUrl = import.meta.env.VITE_API_URL;
+  const cloudName = import.meta.env.VITE_REACT_APP_CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = import.meta.env.VITE_REACT_APP_CLOUDINARY_UPLOAD_PRESET;
 
-  // Fetch the existing portfolio item data to pre-populate the form
   useEffect(() => {
     const fetchPortfolio = async () => {
       try {
         const response = await fetch(`${apiUrl}/api/portfolio/${id}`, {
-          method: 'GET',
+          method: "GET",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
         });
-        if (!response.ok) {
-          throw new Error('Failed to fetch portfolio item');
-        }
+        if (!response.ok) throw new Error("Failed to fetch portfolio item");
         const data = await response.json();
         setPortfolio(data);
         setLoading(false);
       } catch (error) {
         console.error(error.message);
-        setMessage('Error loading portfolio item');
+        setMessage("Error loading portfolio item");
         setLoading(false);
       }
     };
@@ -44,28 +46,60 @@ const EditPortfolioPage = () => {
     fetchPortfolio();
   }, [id]);
 
-  // Handle form submission
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("upload_preset", uploadPreset);
+    formData.append("file", file);
+
+    const resourceType = file.type.startsWith("video") ? "video" : "image";
+
+    try {
+      setUploading(true);
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) throw new Error("File upload failed");
+
+      const data = await response.json();
+      setPortfolio((prevPortfolio) => ({
+        ...prevPortfolio,
+        images: [...prevPortfolio.images, data.secure_url],
+      }));
+      setUploading(false);
+    } catch (error) {
+      console.error("Upload error:", error);
+      setMessage("Error uploading file");
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const response = await fetch(`${apiUrl}/api/portfolio/${id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(portfolio),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to update portfolio item');
-      }
+      if (!response.ok) throw new Error("Failed to update portfolio item");
 
-      setMessage('Portfolio item updated successfully');
-      navigate(`/portfolio/${id}`); // Redirect to the project details page after successful edit
+      setMessage("Portfolio item updated successfully");
+      navigate(`/portfolio/${id}`);
     } catch (error) {
       console.error(error.message);
-      setMessage('Error updating portfolio item');
+      setMessage("Error updating portfolio item");
     }
   };
 
@@ -77,22 +111,17 @@ const EditPortfolioPage = () => {
     }));
   };
 
-  const handleImageChange = (e) => {
-    setPortfolio((prevPortfolio) => ({
-      ...prevPortfolio,
-      images: e.target.value.split(','), // Assuming images are entered as comma-separated URLs
-    }));
-  };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  if (loading) return <div>Loading...</div>;
 
   return (
     <Container>
       <h1>Edit Portfolio Item</h1>
 
-      {message && <Alert variant={message.includes('Error') ? 'danger' : 'success'}>{message}</Alert>}
+      {message && (
+        <Alert variant={message.includes("Error") ? "danger" : "success"}>
+          {message}
+        </Alert>
+      )}
 
       <Form onSubmit={handleSubmit}>
         <Form.Group controlId="title">
@@ -119,13 +148,40 @@ const EditPortfolioPage = () => {
         </Form.Group>
 
         <Form.Group controlId="images" className="mt-3">
-          <Form.Label>Images (comma separated URLs)</Form.Label>
+          <Form.Label>Upload Images or Videos</Form.Label>
           <Form.Control
-            type="text"
-            name="images"
-            value={portfolio.images.join(',')}
-            onChange={handleImageChange}
+            type="file"
+            accept="image/*,video/*"
+            onChange={handleFileUpload}
           />
+          {uploading && <p>Uploading...</p>}
+          <div className="mt-2">
+            {portfolio.images.map((image, index) =>
+              image.endsWith(".mp4") ? (
+                <video
+                  key={index}
+                  src={image}
+                  controls
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    marginRight: "10px",
+                  }}
+                />
+              ) : (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`Portfolio ${index}`}
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    marginRight: "10px",
+                  }}
+                />
+              )
+            )}
+          </div>
         </Form.Group>
 
         <Form.Group controlId="category" className="mt-3">
@@ -136,15 +192,16 @@ const EditPortfolioPage = () => {
             value={portfolio.category}
             onChange={handleInputChange}
           >
-            <option value="">Select a category</option>
-            <option value="design">Design</option>
-            <option value="development">Development</option>
-            <option value="marketing">Marketing</option>
-            <option value="other">Other</option>
+            <option>Select Category</option>
+            <option value="casual">Casual</option>
+            <option value="traditional">Traditional</option>
+            <option value="bridal">Bridal</option>
+            <option value="formal">Formal</option>
+            <option value="others">Other</option>
           </Form.Control>
         </Form.Group>
 
-        <Button variant="primary" type="submit" className="mt-4">
+        <Button variant="warning" type="submit" className="mt-4 mb-4">
           Update Portfolio
         </Button>
       </Form>

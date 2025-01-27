@@ -23,6 +23,7 @@ import AdminTestimony from "./components/testimony/AdminTestimony";
 import ProjectDetailPage from "./components/portfolio/ProjectDetailPage";
 import ResetPassword from "./components/authentication/ResetPassword";
 import EditPortfolioPage from "./components/portfolio/EditPortfolioPage";
+import ReviewPopup from "./components/testimony/ReviewPopup"
 
 
 const App = () => {
@@ -64,6 +65,8 @@ const App = () => {
       ) : (
         <div>
           <NavComp />
+
+          <ReviewPopup />
   
           <Routes>
             <Route path="/" element={<HomePage />} />
