@@ -5,7 +5,7 @@ const Splash = () => {
     <div className="splash-container">
       <img
         src="./images/newlogo.png"
-        alt="App Logo"
+        alt="CUTSBYADUNNI Logo"
         className="splash-logo"
       />
     </div>
