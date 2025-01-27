@@ -266,7 +266,7 @@ const OrderPage = () => {
             <Form.Label>Measurements</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Provide your measurements"
+              placeholder="Provide your measurements Example: { chest: 40, waist: 30 }"
               value={measurements}
               onChange={(e) => setMeasurements(e.target.value)}
             />
