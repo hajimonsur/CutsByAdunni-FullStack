@@ -20,7 +20,7 @@ const Footer = () => {
       {/* Social Media Icons */}
       <div style={{ marginBottom: '15px' }}>
         <a
-          href="https://facebook.com"
+          href="#"
           target="_blank"
           rel="noopener noreferrer"
           style={{

@@ -43,7 +43,7 @@ function NavComp() {
       <Container fluid className="container">
         <Navbar.Brand href="/">
           <Image
-            src="./images/newlogo.png"
+            src="https://res.cloudinary.com/dtcjgwt8p/image/upload/v1738074026/ednj0qmxzxo7i1tkc1hu.png"
             alt="CutByAdunni Logo"
             width={90}
             height={60}
