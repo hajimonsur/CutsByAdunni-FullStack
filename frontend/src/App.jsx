@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Routes, Route, Router } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, Router } from "react-router-dom";
 import { isTokenExpired } from "./components/AuthUtility";
 import NavComp from "./components/Header";
 import Splash from "./components/splash/Splash";
@@ -67,40 +66,35 @@ const App = () => {
 
           <ReviewPopup />
 
-          <Router>
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/order" element={<OrderPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/portfolio" element={<PortfolioPage />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/update" element={<UpdatePortfolio />} />
-              <Route path="*" element={<PageNotFound />} />
-              <Route path="/order/:id" element={<SingleOrder />} />
-              <Route path="/adminOrder" element={<AdminOrder />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/users" element={<AllUsers />} />
-              <Route path="/testimony" element={<UploadTestimony />} />
-              <Route path="/admintestimony/" element={<AdminTestimony />} />
-              <Route path="/project/:id" element={<ProjectDetailPage />} />
-              <Route path="/resetpassword" element={<ResetPassword />} />
-              <Route
-                path="/editPortfolio/:id"
-                element={<EditPortfolioPage />}
-              />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/order" element={<OrderPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/portfolio" element={<PortfolioPage />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/update" element={<UpdatePortfolio />} />
+            <Route path="*" element={<PageNotFound />} />
+            <Route path="/order/:id" element={<SingleOrder />} />
+            <Route path="/adminOrder" element={<AdminOrder />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/users" element={<AllUsers />} />
+            <Route path="/testimony" element={<UploadTestimony />} />
+            <Route path="/admintestimony/" element={<AdminTestimony />} />
+            <Route path="/project/:id" element={<ProjectDetailPage />} />
+            <Route path="/resetpassword" element={<ResetPassword />} />
+            <Route path="/editPortfolio/:id" element={<EditPortfolioPage />} />
 
-              {/* ProtectedRoute for the /admin path */}
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute>
-                    <AdminDashboard /> {/* Protected component */}
-                  </ProtectedRoute>
-                }
-              />
-            </Routes>
-          </Router>
+            {/* ProtectedRoute for the /admin path */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminDashboard /> {/* Protected component */}
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
           <Footer />
         </div>
       )}
