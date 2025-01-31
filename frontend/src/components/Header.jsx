@@ -4,6 +4,7 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { Image } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function NavComp() {
   const navigate = useNavigate();
@@ -12,7 +13,6 @@ function NavComp() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
   const [userRole, setUserRole] = useState(""); // Track user's role
- 
 
   useEffect(() => {
     const isUserLoggedIn = localStorage.getItem("loggedIn") === "true";
@@ -57,9 +57,15 @@ function NavComp() {
               style={{ maxHeight: "100px" }}
               navbarScroll
             >
-              <Nav.Link href="/">Home</Nav.Link>
-              <Nav.Link href="/portfolio">Portfolio</Nav.Link>
-              <Nav.Link href="/admin">Dashboard</Nav.Link>
+              <Nav.Link as={Link} to="/">
+                Home
+              </Nav.Link>
+              <Nav.Link as={Link} to="/portfolio">
+                Portfolio
+              </Nav.Link>
+              <Nav.Link as={Link} to="/admin">
+                Dashboard
+              </Nav.Link>
             </Nav>
           ) : (
             <Nav
@@ -67,12 +73,18 @@ function NavComp() {
               style={{ maxHeight: "100px" }}
               navbarScroll
             >
-              <Nav.Link href="/">Home</Nav.Link>
-              <Nav.Link href="/portfolio">Portfolio</Nav.Link>
-              <Nav.Link href="/order">Order</Nav.Link>
-              <Nav.Link href="/contact">Contact</Nav.Link>
-             
-             
+              <Nav.Link as={Link} to="/">
+                Home
+              </Nav.Link>
+              <Nav.Link as={Link} to="/portfolio">
+                Portfolio
+              </Nav.Link>
+              <Nav.Link as={Link} to="/order">
+                Order
+              </Nav.Link>
+              <Nav.Link as={Link} to="/contact">
+                Contact
+              </Nav.Link>
             </Nav>
           )}
 
@@ -87,10 +99,10 @@ function NavComp() {
             </>
           ) : (
             <>
-              <Nav.Link href="/login" className="px-3">
+              <Nav.Link as={Link} to="/login" className="px-3">
                 Login
               </Nav.Link>
-              <Nav.Link href="/signup">SignUp</Nav.Link>
+              <Nav.Link as={Link} to="/signup">SignUp</Nav.Link>
             </>
           )}
         </Navbar.Collapse>
