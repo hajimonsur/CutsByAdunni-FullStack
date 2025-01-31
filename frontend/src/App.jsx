@@ -24,6 +24,7 @@ import ProjectDetailPage from "./components/portfolio/ProjectDetailPage";
 import ResetPassword from "./components/authentication/ResetPassword";
 import EditPortfolioPage from "./components/portfolio/EditPortfolioPage";
 import ReviewPopup from "./components/testimony/ReviewPopup";
+// import VirtualTryOn from "./components/VirtualTryon/VirtualTryon";
 
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
@@ -84,6 +85,7 @@ const App = () => {
             <Route path="/project/:id" element={<ProjectDetailPage />} />
             <Route path="/resetpassword" element={<ResetPassword />} />
             <Route path="/editPortfolio/:id" element={<EditPortfolioPage />} />
+            {/* <Route path="/tryon" element={<VirtualTryOn />} /> */}
 
             {/* ProtectedRoute for the /admin path */}
             <Route
